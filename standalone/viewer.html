@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RapClouds — J. Cole The Fall-Off</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-card: #1c2333;
+    --accent: #1191ea;
+    --accent-hover: #1a7fd4;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --border: #30363d;
+    --danger: #f85149;
+    --success: #3fb950;
+  }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    text-align: center;
+  }
+
+  header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), #a5d6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.3rem;
+  }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .controls {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .control-group label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  select, input[type="number"], input[type="color"] {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  button:hover { background: var(--accent-hover); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .view-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .view-toggle button {
+    border-radius: 0;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    padding: 0.4rem 0.8rem;
+  }
+
+  .view-toggle button.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  .gallery {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .gallery.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .gallery.single {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .cloud-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+
+  .cloud-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .cloud-card.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .cloud-card img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: #000;
+    display: block;
+  }
+
+  .cloud-card .info {
+    padding: 0.8rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cloud-card .track-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .cloud-card .word-count {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .cloud-card .actions {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .cloud-card .actions button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .cloud-card .actions button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .lightbox.active { display: flex; }
+
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .lightbox .caption {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .lightbox .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    font-size: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+  }
+
+  .empty-state h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+  .empty-state code {
+    background: var(--bg-card);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  .stats {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 768px) {
+    .gallery.grid { grid-template-columns: 1fr; }
+    .controls { padding: 0.8rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎤 RapClouds</h1>
+  <p>J. Cole — The Fall-Off Word Cloud Gallery</p>
+</header>
+
+<div class="controls" id="controls">
+  <div class="view-toggle">
+    <button class="active" onclick="setView('grid')" id="btn-grid">Grid</button>
+    <button onclick="setView('single')" id="btn-single">Single</button>
+  </div>
+  
+  <div class="control-group">
+    <label>Preset:</label>
+    <select id="preset-select" onchange="applyPreset()">
+      <option value="concert_bw">Concert B&W</option>
+      <option value="transparent_face">Transparent Face</option>
+      <option value="bold_red">Bold Red</option>
+      <option value="minimalist">Minimalist</option>
+      <option value="cole_world">Cole World</option>
+    </select>
+  </div>
+
+  <div class="control-group">
+    <label>BG:</label>
+    <input type="color" id="bg-color" value="#000000" onchange="refreshView()">
+  </div>
+
+  <div class="control-group">
+    <label>W:</label>
+    <input type="number" id="cloud-width" value="1000" min="200" max="2000" step="100" style="width:70px">
+  </div>
+
+  <div class="control-group">
+    <label>H:</label>
+    <input type="number" id="cloud-height" value="1000" min="200" max="2000" step="100" style="width:70px">
+  </div>
+
+  <button onclick="downloadAll()">⬇ Download All</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="gallery grid" id="gallery">
+  <div class="empty-state" id="empty-state">
+    <h2>No word clouds yet</h2>
+    <p>Generate some clouds first:</p>
+    <br>
+    <code>python3 run.py</code>
+    <br><br>
+    <p>With a mask image (J. Cole's face):</p>
+    <code>python3 run.py --mask masks/jcole_face.png</code>
+    <br><br>
+    <p>Try a preset style:</p>
+    <code>python3 run.py --preset bold_red --album</code>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="close-btn" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="">
+  <div class="caption" id="lightbox-caption"></div>
+</div>
+
+<script>
+  const CLOUDS_DIR = './output';
+  let clouds = [];
+  let currentView = 'grid';
+
+  // Scan for cloud images
+  async function loadClouds() {
+    try {
+      const resp = await fetch(`${CLOUDS_DIR}/manifest.json`);
+      if (resp.ok) {
+        clouds = await resp.json();
+      }
+    } catch(e) {
+      // No manifest, try to list files
+    }
+
+    // Fallback: try known file patterns
+    if (clouds.length === 0) {
+      const knownTracks = [
+        '29_Intro', 'Two_Six', 'SAFETY', 'Run_A_Train', 'Poor_Thang',
+        'Legacy', 'Bunce_Road_Blues', 'WHO_TF_IZ_U', 'Drum_n_Bass',
+        'The_Let_Out', 'Bombs_in_the_Ville', 'Lonely_at_the_Top',
+        '39_Intro', 'The_Fall-Off_Is_Inevitable', 'The_Villest',
+        'Old_Dog', 'Life_Sentence', 'Only_You', 'Man_Up_Above',
+        'I_Love_Her_Again', 'What_If', 'Quik_Stop',
+        'and_the_whole_world_is_the_Ville', 'Ocean_Way',
+        'album_all_tracks'
+      ];
+
+      for (const track of knownTracks) {
+        clouds.push({
+          name: track.replace(/_/g, ' '),
+          file: `${CLOUDS_DIR}/${track}.png`,
+          words: '?'
+        });
+      }
+    }
+
+    renderGallery();
+  }
+
+  function renderGallery() {
+    const gallery = document.getElementById('gallery');
+    const emptyState = document.getElementById('empty-state');
+    const stats = document.getElementById('stats');
+
+    if (clouds.length === 0) {
+      gallery.innerHTML = '';
+      gallery.appendChild(emptyState);
+      emptyState.style.display = 'block';
+      return;
+    }
+
+    emptyState.style.display = 'none';
+    stats.textContent = `${clouds.length} word clouds • Generated from Genius lyrics`;
+
+    gallery.className = `gallery ${currentView}`;
+    gallery.innerHTML = '';
+
+    clouds.forEach((cloud, idx) => {
+      const card = document.createElement('div');
+      card.className = 'cloud-card';
+      card.onclick = (e) => {
+        if (e.target.tagName !== 'BUTTON') openLightbox(cloud);
+      };
+
+      card.innerHTML = `
+        <img src="${cloud.file}" alt="${cloud.name}" loading="lazy"
+             onerror="this.style.display='none'">
+        <div class="info">
+          <div>
+            <div class="track-name">${cloud.name}</div>
+            <div class="word-count">${cloud.words || '?'} words</div>
+          </div>
+          <div class="actions">
+            <button onclick="event.stopPropagation(); downloadCloud('${cloud.file}', '${cloud.name}')">⬇</button>
+            <button onclick="event.stopPropagation(); openInTab('${cloud.file}')">↗</button>
+          </div>
+        </div>
+      `;
+      gallery.appendChild(card);
+    });
+  }
+
+  function setView(view) {
+    currentView = view;
+    document.getElementById('btn-grid').classList.toggle('active', view === 'grid');
+    document.getElementById('btn-single').classList.toggle('active', view === 'single');
+    renderGallery();
+  }
+
+  function openLightbox(cloud) {
+    const lb = document.getElementById('lightbox');
+    document.getElementById('lightbox-img').src = cloud.file;
+    document.getElementById('lightbox-caption').textContent = cloud.name;
+    lb.classList.add('active');
+  }
+
+  function closeLightbox(e) {
+    if (!e || e.target === document.getElementById('lightbox') || e.target.classList.contains('close-btn')) {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+  }
+
+  function downloadCloud(file, name) {
+    const a = document.createElement('a');
+    a.href = file;
+    a.download = `${name}_RapCloud.png`;
+    a.click();
+  }
+
+  function openInTab(file) {
+    window.open(file, '_blank');
+  }
+
+  function downloadAll() {
+    clouds.forEach(c => {
+      setTimeout(() => downloadCloud(c.file, c.name), 100);
+    });
+  }
+
+  function applyPreset() {
+    const preset = document.getElementById('preset-select').value;
+    const presets = {
+      concert_bw: { bg: '#000000' },
+      transparent_face: { bg: '#000000' },
+      bold_red: { bg: '#1a0000' },
+      minimalist: { bg: '#ffffff' },
+      cole_world: { bg: '#0d1117' },
+    };
+    if (presets[preset]) {
+      document.getElementById('bg-color').value = presets[preset].bg;
+    }
+  }
+
+  function refreshView() { renderGallery(); }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  loadClouds();
+</script>
+</body>
+</html>
