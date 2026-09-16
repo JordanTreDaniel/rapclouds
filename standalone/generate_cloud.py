@@ -68,7 +68,12 @@ RAP_STOPWORDS.update([
     "like", "just", "got", "get", "go", "gon", "man", "shit",
     "fuck", "bitch", "nigga", "niggas", "huh", "uh", "ah",
     "one", "two", "three", "first", "new", "way", "back",
-    "still", "even", "also", "well", "right", "now", "ever",
+    "still", "even", "also", "right", "now", "ever",
+    # Scraped metadata artifacts that survive cleaning
+    "fayettevi", "jcolelyricssongs", "jcolemiddlechildlyrics",
+    "jcolepowertripllyrics", "jcolepowertripfeatmiguellyrics",
+    "albumcovers", "thumbjpg", "lyrics", "suggesteditsong",
+    "fayettevi",  # Spelled-out "Fayetteville" in lyrics
 ])
 
 
@@ -84,12 +89,39 @@ def load_lyrics_from_string(lyrics_text):
 
 
 def clean_lyrics(lyrics, include_numbers=True):
-    """Clean lyrics for word cloud generation."""
+    """Clean lyrics for word cloud generation.
+    
+    IMPORTANT: Remove metadata/artifacts BEFORE stripping non-alpha chars,
+    otherwise things like 'albumcovers26jcolethefalloff' become single tokens.
+    """
     text = lyrics.lower()
     # Remove annotations, stage directions
     text = re.sub(r"\[.*?\]", "", text)
     # Remove URLs
     text = re.sub(r"http\S+", "", text)
+    # Remove scraped metadata (BEFORE stripping non-alpha)
+    text = re.sub(r"albumcovers?\w*thumbjpg\w*", "", text)
+    text = re.sub(r"suggesteditsong\w+lyrics", "", text)
+    text = re.sub(r"falloffjcole\w+lyrics", "", text)
+    text = re.sub(r"jcole\w*lyrics\w*", "", text)
+    text = re.sub(r"jcolelyricssongs", "", text)
+    text = re.sub(r"fayettevi\w*", "", text)
+    text = re.sub(r"algorithm\s*moderated", "", text)
+    text = re.sub(r"streaming\s*service\s*automated", "", text)
+    text = re.sub(r"shark\s*infested", "", text)
+    # Remove web page metadata appended to lyrics
+    text = re.sub(r"are these lyrics accurate.*", "", text)
+    text = re.sub(r"written\s*##.*", "", text)
+    text = re.sub(r"keep exploring.*", "", text)
+    text = re.sub(r"more j\.? cole songs.*", "", text)
+    text = re.sub(r"browse all.*", "", text)
+    text = re.sub(r"next track.*", "", text)
+    text = re.sub(r"on the fall-off.*", "", text)
+    text = re.sub(r"all j\.? cole songs.*", "", text)
+    text = re.sub(r"looks right.*", "", text)
+    text = re.sub(r"needs a fix.*", "", text)
+    # Generic: remove lines that are clearly metadata (short, contain 'lyrics' alone)
+    text = re.sub(r"\blyrics\b", "", text)
     # Remove non-alpha chars (keep spaces)
     if not include_numbers:
         text = re.sub(r"[^a-z\s]", "", text)
@@ -97,7 +129,10 @@ def clean_lyrics(lyrics, include_numbers=True):
         text = re.sub(r"[^a-z0-9\s]", "", text)
     # Collapse whitespace
     text = re.sub(r"\s+", " ", text).strip()
-    return text
+    # Filter out any remaining long tokens (>15 chars = metadata artifact)
+    words = text.split()
+    words = [w for w in words if len(w) <= 15]
+    return " ".join(words)
 
 
 def create_mask_from_image(mask_path, width, height, white_threshold=200, blackout_threshold=1):
@@ -226,24 +261,47 @@ def generate_wordcloud(
 
 
 def _recolor_from_mask(wc, mask_path, settings):
-    """Recolor words based on the mask image colors."""
+    """Recolor words based on the mask image colors.
+    
+    For each word, sample the average color from the region of the mask
+    that the word occupies. This makes the word cloud look like the
+    original image when viewed from a distance.
+    """
     try:
         mask_img = Image.open(mask_path).convert("RGB")
         mask_img = mask_img.resize((wc.width, wc.height), Image.LANCZOS)
         mask_arr = np.array(mask_img)
 
-        # For each word position, sample the color from the mask
-        # This is a simplified version - the original uses more sophisticated sampling
-        layout = wc.layout_
-        for (word, freq, font, position, orientation, color) in layout:
-            if position:
-                x, y = position[1], position[0]
-                # Clamp to image bounds
-                x = min(max(0, x), wc.width - 1)
-                y = min(max(0, y), wc.height - 1)
-                # Sample color from mask
+        # Build a new color_func that samples from the mask
+        def mask_color_func(word, font_size, position, orientation,
+                           random_state=None, **kwargs):
+            if position is None:
+                return "rgb(128, 128, 128)"
+            x, y = int(position[1]), int(position[0])
+            # Clamp to image bounds
+            x = min(max(0, x), wc.width - 1)
+            y = min(max(0, y), wc.height - 1)
+            # Sample a small region around the word position for average color
+            half = max(1, font_size // 3)
+            y1 = max(0, y - half)
+            y2 = min(wc.height, y + half)
+            x1 = max(0, x - half)
+            x2 = min(wc.width, x + half)
+            region = mask_arr[y1:y2, x1:x2]
+            if region.size == 0:
                 r, g, b = mask_arr[y, x]
-                wc.update({word: 0})  # Keep existing layout
+            else:
+                r = int(np.mean(region[:, :, 0]))
+                g = int(np.mean(region[:, :, 1]))
+                b = int(np.mean(region[:, :, 2]))
+            # Skip near-black (background) - return a light color instead
+            if r + g + b < 30:
+                return "rgb(200, 200, 200)"
+            return f"rgb({r}, {g}, {b})"
+
+        wc.color_func = mask_color_func
+        # Re-color using the new color_func
+        wc.recolor()
 
     except Exception as e:
         print(f"  ⚠️  Color-from-mask failed: {e}")
