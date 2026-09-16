@@ -8,6 +8,7 @@ The underscored phrases display with spaces in the final cloud.
 """
 import os
 import re
+import argparse
 import time
 import random
 import numpy as np
@@ -32,6 +33,20 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 MASK_SILHOUETTE = os.path.join(MASKS_DIR, "jcole_silhouette_toppng.png")
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Phrase collocations word cloud")
+    p.add_argument("--lyrics-dir", default="lyrics")
+    p.add_argument("--mask", default="masks/jcole_silhouette_toppng.png")
+    p.add_argument("--output", default="output_innovations")
+    p.add_argument("--font", default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
+    p.add_argument("--max-n", type=int, default=6, help="Max n-gram length")
+    p.add_argument("--min-count", type=int, default=2, help="Min phrase occurrences")
+    p.add_argument("--width", type=int, default=1200)
+    p.add_argument("--height", type=int, default=1200)
+    p.add_argument("--bg", default="#000000")
+    return p.parse_args()
+
 
 RAP_STOPWORDS = STOPWORDS.copy()
 RAP_STOPWORDS.update([

@@ -26,19 +26,30 @@ os.chdir(SCRIPT_DIR)
 sys.path.insert(0, '.')
 from generate_cloud import clean_lyrics
 
-# ─── Paths ──────────────────────────────────────────────────────────────────
-LYRICS_DIR = "lyrics"
-MASKS_DIR = "masks"
-OUTPUT_DIR = "output_innovations"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+# ─── CLI Arguments ─────────────────────────────────────────────────────────
+import argparse
 
+def parse_args():
+    p = argparse.ArgumentParser(description="Color layer stacking word cloud")
+    p.add_argument("--lyrics-dir", default="lyrics", help="Directory of lyrics .txt files")
+    p.add_argument("--mask", required=True, help="Path to color portrait image")
+    p.add_argument("--output", default="output_innovations", help="Output directory")
+    p.add_argument("--font", default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
+    p.add_argument("--width", type=int, default=1200)
+    p.add_argument("--height", type=int, default=1200)
+    p.add_argument("--clusters", type=int, default=7, help="K-means color clusters")
+    p.add_argument("--threshold", type=int, default=50, help="RGB distance threshold")
+    p.add_argument("--max-words", type=int, default=800)
+    p.add_argument("--album", action="store_true", help="Combine all lyrics into one cloud")
+    return p.parse_args()
+
+# ─── Paths (defaults, overridden by CLI) ───────────────────────────────────
 FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-COLOR_PORTRAIT = os.path.join(MASKS_DIR, "jcole_color_original.png")
 
 # ─── Constants ──────────────────────────────────────────────────────────────
 WIDTH, HEIGHT = 1200, 1200
 K_CLUSTERS = 7
-RGB_THRESHOLD = 50  # Euclidean distance in RGB space
+RGB_THRESHOLD = 50
 
 RAP_STOPWORDS = STOPWORDS.copy()
 RAP_STOPWORDS.update([
@@ -165,6 +176,18 @@ def make_color_func(original_img_arr, cluster_center):
 
 
 def main():
+    args = parse_args()
+    
+    # Set globals from args
+    global LYRICS_DIR, OUTPUT_DIR, WIDTH, HEIGHT, K_CLUSTERS, RGB_THRESHOLD, FONT_BOLD
+    LYRICS_DIR = args.lyrics_dir
+    OUTPUT_DIR = args.output
+    WIDTH, HEIGHT = args.width, args.height
+    K_CLUSTERS = args.clusters
+    RGB_THRESHOLD = args.threshold
+    FONT_BOLD = args.font
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    
     print("=" * 60)
     print("  TRUE COLOR LAYER STACKING")
     print("=" * 60)
@@ -177,7 +200,7 @@ def main():
 
     # Load color portrait
     print("\n2. Loading color portrait...")
-    portrait = Image.open(COLOR_PORTRAIT).convert("RGB")
+    portrait = Image.open(args.mask).convert("RGB")
     portrait_resized = portrait.resize((WIDTH, HEIGHT), Image.LANCZOS)
     portrait_arr = np.array(portrait_resized)
     print(f"   Original size: {portrait.size}, Resized to: {WIDTH}x{HEIGHT}")
@@ -233,7 +256,7 @@ def main():
             width=WIDTH,
             height=HEIGHT,
             background_color=None,  # TRANSPARENT
-            max_words=800,
+            max_words=args.max_words,
             stopwords=RAP_STOPWORDS,
             min_font_size=4,
             max_font_size=50,

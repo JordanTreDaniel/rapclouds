@@ -7,6 +7,7 @@ import os
 import re
 import time
 import random
+import argparse
 import numpy as np
 from PIL import Image
 from wordcloud import WordCloud, STOPWORDS
@@ -32,6 +33,20 @@ MASK_SILHOUETTE = os.path.join(MASKS_DIR, "jcole_silhouette_toppng.png")
 MASK_COLOR = os.path.join(MASKS_DIR, "jcole_color_mask.png")
 MASK_FINAL = os.path.join(MASKS_DIR, "jcole_final_mask.png")
 
+def parse_args():
+    p = argparse.ArgumentParser(description="Optimized word cloud generator")
+    p.add_argument("--lyrics-dir", default="lyrics")
+    p.add_argument("--masks-dir", default="masks")
+    p.add_argument("--output", default="output_final")
+    p.add_argument("--mask", help="Override mask path (any .png)")
+    p.add_argument("--font", default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
+    p.add_argument("--width", type=int, default=1200)
+    p.add_argument("--height", type=int, default=1200)
+    p.add_argument("--bg", default="#000000", help="Background color hex")
+    p.add_argument("--preset", choices=["bw", "blue", "red", "color"], default="bw")
+    p.add_argument("--album", action="store_true", help="Combine all tracks")
+    return p.parse_args()
+
 # Extended stop words
 RAP_STOPWORDS = STOPWORDS.copy()
 RAP_STOPWORDS.update([
@@ -53,12 +68,13 @@ RAP_STOPWORDS.update([
 ])
 
 
-def load_all_lyrics():
+def load_all_lyrics(lyrics_dir=None):
     """Load and combine all cleaned lyrics using the FIXED clean_lyrics."""
+    lyrics_dir = lyrics_dir or LYRICS_DIR
     all_text = []
-    for fname in sorted(os.listdir(LYRICS_DIR)):
+    for fname in sorted(os.listdir(lyrics_dir)):
         if fname.endswith(".txt") and fname != "manifest.json":
-            with open(os.path.join(LYRICS_DIR, fname)) as f:
+            with open(os.path.join(lyrics_dir, fname)) as f:
                 text = f.read()
             cleaned = clean_lyrics(text, include_numbers=False)
             if len(cleaned.split()) > 20:
@@ -195,8 +211,9 @@ def generate(name, text, settings, mask_path, font_path,
 
 
 def main():
+    args = parse_args()
     print("=== RapClouds Final Generation ===\n")
-    text = load_all_lyrics()
+    text = load_all_lyrics(args.lyrics_dir)
     
     # Common dense settings
     W, H = 1200, 1200
