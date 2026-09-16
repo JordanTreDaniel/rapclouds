@@ -30,6 +30,7 @@ from wordcloud import WordCloud, STOPWORDS
 def parse_args():
     p = argparse.ArgumentParser(description="RapClouds v7 — Frequency-Weighted Phrases")
     p.add_argument("--lyrics-dir", default="lyrics", help="Directory of lyrics .txt files")
+    p.add_argument("--lyrics", default=None, help="Single lyrics .txt file (overrides --lyrics-dir)")
     p.add_argument("--mask", required=True, help="Path to color portrait image")
     p.add_argument("--output", default="output_v7", help="Output directory")
     p.add_argument("--font", default="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
@@ -411,7 +412,13 @@ def main():
 
     # ── 1. Load lyrics ──────────────────────────────────────────────────
     print("1. Loading lyrics...")
-    text = load_all_lyrics(args.lyrics_dir)
+    if args.lyrics:
+        with open(args.lyrics) as f:
+            raw = f.read()
+        text = clean_lyrics(raw, include_numbers=False)
+        print(f"   Single file: {args.lyrics} ({len(text.split())} words)")
+    else:
+        text = load_all_lyrics(args.lyrics_dir)
     words = text.split()
     print(f"   Total words: {len(words)}")
 
