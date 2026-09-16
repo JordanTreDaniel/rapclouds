@@ -2,3 +2,4 @@
 __pycache__/
 output*/
 *.pyc
+wordcloud_fork_repo/
