@@ -1,0 +1,18 @@
+# Cloudflared tunnel config for rapclouds.jordanchristley.com
+# This is a TEMPLATE — replace <TUNNEL_ID> and <CREDS_FILE> after running:
+#   cloudflared tunnel login
+#   cloudflared tunnel create rapclouds
+#   cloudflared tunnel route dns rapclouds rapclouds.jordanchristley.com
+#
+# Works on any cloud (GCP, Oracle, local, etc.)
+# The deploy script auto-generates /root/.cloudflared/config.yml on the VM.
+
+tunnel: <TUNNEL_ID>
+credentials-file: /root/.cloudflared/<CREDS_FILE>.json
+
+ingress:
+  - hostname: rapclouds.jordanchristley.com
+    service: http://localhost:8000
+    originRequest:
+      noTLSVerify: false
+  - service: http_status:404

@@ -1,0 +1,179 @@
+.btn {
+  transition: all 0.2s;
+}
+
+.gallery__thumb {
+  transition: all 0.2s;
+}
+
+.palette__swatch {
+  transition: all 0.15s;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-light);
+  border-radius: 3px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-cyan);
+  cursor: pointer;
+  border: 2px solid var(--color-bg);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.27);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-cyan);
+  cursor: pointer;
+  border: 2px solid var(--color-bg);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.27);
+}
+
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle__track {
+  position: absolute;
+  inset: 0;
+  background: var(--color-border);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle__track::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  top: 2px;
+  left: 2px;
+  transition: all 0.2s;
+}
+
+.toggle input:checked + .toggle__track {
+  background: var(--color-pink);
+}
+
+.toggle input:checked + .toggle__track::after {
+  transform: translateX(18px);
+  background: #fff;
+}
+
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap::after {
+  content: "v";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-dim);
+  pointer-events: none;
+  font-size: 0.75rem;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn--generate:hover {
+  box-shadow: 0 4px 20px rgba(255, 20, 147, 0.27);
+}
+
+@media (max-width: 1024px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--header-h) 1fr auto var(--gallery-h);
+    grid-template-areas:
+      "header"
+      "main"
+      "sidebar"
+      "gallery";
+  }
+
+  .sidebar {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    max-height: 50vh;
+  }
+
+  :root {
+    --sidebar-w: 100%;
+  }
+
+  .header__export {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 13px;
+  }
+
+  .header {
+    padding: 0 12px;
+  }
+
+  .main {
+    padding: 12px;
+  }
+
+  .sidebar {
+    padding: 12px;
+  }
+
+  .gallery {
+    padding: 12px;
+  }
+
+  .gallery__thumb {
+    width: 120px;
+    height: 90px;
+  }
+
+  .header__artist-info {
+    display: none;
+  }
+}

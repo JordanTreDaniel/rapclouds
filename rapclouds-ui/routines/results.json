@@ -1,0 +1,38 @@
+{
+  "target": "https://rapclouds.jordanchristley.com",
+  "passed": 6,
+  "total": 6,
+  "all_pass": true,
+  "steps": [
+    {
+      "name": "load_app",
+      "pass": true,
+      "time_s": 3.34
+    },
+    {
+      "name": "check_sidebar",
+      "pass": true,
+      "time_s": 0.06
+    },
+    {
+      "name": "select_track",
+      "pass": true,
+      "time_s": 4.59
+    },
+    {
+      "name": "click_generate",
+      "pass": true,
+      "time_s": 1.92
+    },
+    {
+      "name": "wait_for_result",
+      "pass": true,
+      "time_s": 11.92
+    },
+    {
+      "name": "check_gallery",
+      "pass": true,
+      "time_s": 0.01
+    }
+  ]
+}
