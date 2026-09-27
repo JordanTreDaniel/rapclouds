@@ -985,8 +985,16 @@ async def update_song_timing(name: str, req: UpdateTimingRequest):
 async def serve_spa(request: Request, full_path: str = ""):
     file_path = os.path.join(DIST_DIR, full_path)
     if full_path and os.path.isfile(file_path):
-        return FileResponse(file_path)
+        response = FileResponse(file_path)
+        # Cache-bust HTML, allow caching for hashed assets
+        if full_path.endswith('.html') or full_path == '':
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+        else:
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
     index = os.path.join(DIST_DIR, "index.html")
     if os.path.isfile(index):
-        return FileResponse(index)
+        response = FileResponse(index)
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+        return response
     return HTMLResponse("<h1>Build not found. Run: node ./node_modules/vite/bin/vite.js build</h1>", status_code=404)

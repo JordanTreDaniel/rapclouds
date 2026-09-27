@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import SongList from '../components/admin/SongList';
 import LyricsEditor from '../components/admin/LyricsEditor';
-import TimingEditor from '../components/admin/TimingEditor';
+import TimelineEditor from '../components/admin/TimelineEditor';
 import { fetchSong, updateSongText, updateSongTiming } from '../api';
 import type { GroundTruth } from '../types';
 
@@ -68,7 +68,14 @@ export default function Admin() {
           >
             ← Songs
           </button>
-          <h2 className="text-text font-semibold truncate">{selectedSong}</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-text font-semibold truncate">{selectedSong}</h2>
+            {songData && (
+              <span className="text-xs text-text-muted">
+                {songData.words.length} words · {songData.text.length} chars
+              </span>
+            )}
+          </div>
           <div className="ml-auto flex items-center gap-2">
             {saving && <span className="text-xs text-pink animate-pulse">Saving…</span>}
             {/* Tab switcher */}
@@ -120,7 +127,7 @@ export default function Admin() {
             activeTab === 'lyrics' ? (
               <LyricsEditor text={songData.text} onSave={handleTextSave} />
             ) : (
-              <TimingEditor words={songData.words} onTimingSave={handleTimingSave} />
+              <TimelineEditor words={songData.words} onTimingSave={handleTimingSave} />
             )
           ) : null}
         </div>

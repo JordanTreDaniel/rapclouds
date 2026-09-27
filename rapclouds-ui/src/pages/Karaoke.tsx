@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
+import { useAudioPlayback } from '../hooks/useAudioPlayback';
+import { useRecording } from '../hooks/useRecording';
 import SongPicker from '../components/karaoke/SongPicker';
 import SectionPicker from '../components/karaoke/SectionPicker';
 import LyricsDisplay from '../components/karaoke/LyricsDisplay';
@@ -20,23 +22,19 @@ export default function Karaoke() {
   const [groundTruth, setGroundTruth] = useState<GroundTruth | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [selectedSection, setSelectedSection] = useState<Section | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
   const [countdownActive, setCountdownActive] = useState(false);
   const [gradingActive, setGradingActive] = useState(false);
   const [gradeResult, setGradeResult] = useState<GradeResult | null>(null);
 
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const rafRef = useRef<number>(0);
   const gradingGuardRef = useRef(false);
+
+  const audio = useAudioPlayback();
+  const recording = useRecording();
 
   const handleSongSelect = useCallback(async (s: SongMeta) => {
     const name = s.name;
     setSong(s);
-    setCurrentTime(0);
+    audio.resetTime();
 
     // Fetch ground truth
     try {
@@ -65,73 +63,22 @@ export default function Karaoke() {
     setView('performance');
 
     // Set audio source
-    if (audioRef.current) {
-      audioRef.current.src = `/songs/${encodeURIComponent(name)}/${s.audio}`;
-      audioRef.current.load();
-    }
-  }, []);
+    audio.loadSrc(`/songs/${encodeURIComponent(name)}/${s.audio}`);
+  }, [audio]);
 
   const handleSectionSelect = useCallback((sec: Section | null) => {
     setSelectedSection(sec);
-    setCurrentTime(0);
-    if (audioRef.current) {
-      audioRef.current.currentTime = sec ? sec.start : 0;
-    }
-  }, []);
-
-  const animate = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    function tick() {
-      if (!audioRef.current) return;
-      setCurrentTime(audioRef.current.currentTime);
-      rafRef.current = requestAnimationFrame(tick);
-    }
-    rafRef.current = requestAnimationFrame(tick);
-  }, []);
-
-  const handleCountdownDone = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    // If clip selected, stop at clip end
-    if (selectedSection) {
-      audio.ontimeupdate = () => {
-        if (audio.currentTime >= selectedSection.end) {
-          finish();
-        }
-      };
-    } else {
-      audio.ontimeupdate = null;
-    }
-
-    audio.play();
-    animate();
-    audio.onended = () => finish();
-  }, [selectedSection, animate]);
+    audio.resetTime();
+    audio.seek(sec ? sec.start : 0);
+  }, [audio]);
 
   const finish = useCallback(async () => {
     if (gradingGuardRef.current) return;
     gradingGuardRef.current = true;
 
-    setIsRecording(false);
-    cancelAnimationFrame(rafRef.current);
+    audio.stop();
 
-    const audio = audioRef.current;
-    if (audio) {
-      audio.onended = null;
-      audio.ontimeupdate = null;
-    }
-
-    if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-      recorderRef.current.stop();
-      recorderRef.current.stream.getTracks().forEach((t) => t.stop());
-    }
-
-    await new Promise((r) => setTimeout(r, 300));
-
-    const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+    const blob = await recording.stopRecording();
     console.log(`Recording: ${blob.size} bytes`);
 
     setGradingActive(true);
@@ -171,26 +118,32 @@ export default function Karaoke() {
       gradingGuardRef.current = false;
       alert('Grading failed: ' + (e as Error).message);
     }
-  }, [song, selectedSection]);
+  }, [audio, recording, song, selectedSection]);
+
+  const handleCountdownDone = useCallback(() => {
+    // If clip selected, stop at clip end
+    if (selectedSection) {
+      audio.audioRef.current!.ontimeupdate = () => {
+        const el = audio.audioRef.current;
+        if (el && el.currentTime >= selectedSection.end) {
+          finish();
+        }
+      };
+    } else {
+      audio.audioRef.current!.ontimeupdate = null;
+    }
+
+    audio.play();
+    audio.audioRef.current!.onended = () => finish();
+  }, [selectedSection, audio, finish]);
 
   const handleStart = useCallback(async () => {
-    const audio = audioRef.current;
-    if (!audio || !groundTruth) return;
+    if (!groundTruth) return;
 
-    audio.currentTime = selectedSection ? selectedSection.start : 0;
+    audio.seek(selectedSection ? selectedSection.start : 0);
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 },
-      });
-      chunksRef.current = [];
-      const rec = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-      rec.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-      rec.start(100);
-      recorderRef.current = rec;
-      setIsRecording(true);
+      await recording.startRecording();
       gradingGuardRef.current = false;
 
       // Start countdown
@@ -198,28 +151,13 @@ export default function Karaoke() {
     } catch {
       alert('Mic access required. Please allow and retry.');
     }
-  }, [groundTruth, selectedSection]);
+  }, [groundTruth, selectedSection, audio, recording]);
 
   const handleStop = useCallback(() => {
-    setIsRecording(false);
-    cancelAnimationFrame(rafRef.current);
     gradingGuardRef.current = false;
-
-    const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-      audio.onended = null;
-      audio.ontimeupdate = null;
-    }
-
-    if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-      recorderRef.current.stop();
-      recorderRef.current.stream.getTracks().forEach((t) => t.stop());
-    }
-
-    setCurrentTime(0);
-  }, []);
+    audio.stop();
+    recording.cleanup();
+  }, [audio, recording]);
 
   const handleBack = useCallback(() => {
     handleStop();
@@ -233,11 +171,11 @@ export default function Karaoke() {
 
   const handleRetry = useCallback(() => {
     setSelectedSection(null);
-    setCurrentTime(0);
+    audio.resetTime();
     if (song) {
       handleSongSelect(song);
     }
-  }, [song, handleSongSelect]);
+  }, [song, handleSongSelect, audio]);
 
   const filteredWords = groundTruth?.words ?? [];
 
@@ -257,7 +195,7 @@ export default function Karaoke() {
         }
       `}</style>
 
-      <audio ref={audioRef} preload="auto" />
+      <audio ref={audio.audioRef} preload="auto" />
 
       <div className="flex flex-col items-center px-4 py-8 max-w-[720px] mx-auto">
         {/* ── SETUP VIEW ── */}
@@ -303,8 +241,8 @@ export default function Karaoke() {
                 className="h-full transition-[width] duration-100"
                 style={{
                   background: 'var(--color-pink)',
-                  width: audioRef.current
-                    ? `${(currentTime / (audioRef.current.duration || 1)) * 100}%`
+                  width: audio.duration
+                    ? `${(audio.currentTime / (audio.duration || 1)) * 100}%`
                     : '0%',
                 }}
               />
@@ -312,20 +250,16 @@ export default function Karaoke() {
 
             <LyricsDisplay
               words={filteredWords}
-              currentTime={currentTime}
+              currentTime={audio.currentTime}
               clipStart={selectedSection?.start ?? null}
               clipEnd={selectedSection?.end ?? null}
-              isPlaying={isRecording}
+              isPlaying={recording.isRecording}
             />
 
             <RecordingControls
-              isRecording={isRecording}
-              isMuted={isMuted}
-              onToggleMute={() => {
-                const next = !isMuted;
-                setIsMuted(next);
-                if (audioRef.current) audioRef.current.muted = next;
-              }}
+              isRecording={recording.isRecording}
+              isMuted={audio.isMuted}
+              onToggleMute={() => audio.setMuted(!audio.isMuted)}
               onStart={handleStart}
               onStop={handleStop}
               onBack={handleBack}
@@ -333,7 +267,7 @@ export default function Karaoke() {
             />
 
             <div className="text-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
-              {isMuted
+              {audio.isMuted
                 ? 'Song muted — lyrics sync still active'
                 : 'Song audio on — use headphones for best results'}
             </div>

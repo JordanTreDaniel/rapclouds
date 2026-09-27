@@ -7,8 +7,7 @@ import { GenerationProvider } from './store/GenerationContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <GenerationProvider>
+    <>
       <style>{`
         * { box-sizing: border-box; }
         .app-shell {
@@ -20,6 +19,8 @@ function App() {
           .app-shell > header { padding: 0 12px !important; }
         }
       `}</style>
+      <BrowserRouter>
+      <GenerationProvider>
       <div className="app-shell">
         <Header />
         <Routes>
@@ -29,7 +30,8 @@ function App() {
         </Routes>
       </div>
       </GenerationProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </>
   );
 }
 

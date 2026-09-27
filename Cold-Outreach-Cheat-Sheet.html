@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cold Outreach Texting Cheat Sheet — Resource Realty</title>
+<style>
+  :root {
+    --bg-primary: #0f1117;
+    --bg-secondary: #1a1d27;
+    --bg-card: #1e2233;
+    --bg-card-hover: #252a3a;
+    --text-primary: #e8eaf0;
+    --text-secondary: #8b90a0;
+    --text-muted: #5a5f72;
+    --green: #34d399;
+    --green-bg: rgba(52, 211, 153, 0.08);
+    --green-border: rgba(52, 211, 153, 0.25);
+    --red: #f87171;
+    --red-bg: rgba(248, 113, 113, 0.08);
+    --red-border: rgba(248, 113, 113, 0.25);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251, 191, 36, 0.08);
+    --amber-border: rgba(251, 191, 36, 0.25);
+    --blue: #60a5fa;
+    --blue-bg: rgba(96, 165, 250, 0.08);
+    --blue-border: rgba(96, 165, 250, 0.25);
+    --border: #2a2e3e;
+    --border-light: #333850;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: 0;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 56px 24px 40px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(96,165,250,0.04) 0%, transparent 100%);
+  }
+  .header__badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: var(--blue-bg);
+    border: 1px solid var(--blue-border);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .header h1 span { color: var(--blue); }
+  .header__subtitle {
+    font-size: clamp(14px, 2.5vw, 17px);
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+  .header__meta {
+    margin-top: 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Container ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* ── Section ── */
+  .section { margin-bottom: 48px; }
+  .section__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding-left: 2px;
+  }
+  .section__title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+  .section__desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border-light); }
+
+  /* ── Grid layouts ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+  }
+  @media (min-width: 769px) and (max-width: 900px) {
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .grid-5 { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ── Color-coded cards ── */
+  .card--green {
+    background: var(--green-bg);
+    border-color: var(--green-border);
+  }
+  .card--red {
+    background: var(--red-bg);
+    border-color: var(--red-border);
+  }
+  .card--amber {
+    background: var(--amber-bg);
+    border-color: var(--amber-border);
+  }
+  .card--blue {
+    background: var(--blue-bg);
+    border-color: var(--blue-border);
+  }
+
+  /* ── Zone headers ── */
+  .zone-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .zone-header__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .zone-header__icon--green { background: rgba(52,211,153,0.15); }
+  .zone-header__icon--red { background: rgba(248,113,113,0.15); }
+  .zone-header__text h3 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .zone-header__text p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* ── Zone item ── */
+  .zone-item {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .zone-item:last-child { border-bottom: none; }
+  .zone-item__title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 3px;
+  }
+  .zone-item__desc {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .zone-item__tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-top: 5px;
+  }
+  .zone-item__tag--safe {
+    color: var(--green);
+    background: rgba(52,211,153,0.12);
+  }
+  .zone-item__tag--risk {
+    color: var(--red);
+    background: rgba(248,113,113,0.12);
+  }
+  .zone-item__tag--danger {
+    color: #ff4444;
+    background: rgba(255,68,68,0.15);
+  }
+
+  /* ── Rule card ── */
+  .rule-card {
+    position: relative;
+    padding: 20px 20px 20px 56px;
+  }
+  .rule-card__number {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    background: rgba(251,191,36,0.15);
+    color: var(--amber);
+    border: 1px solid rgba(251,191,36,0.3);
+  }
+  .rule-card__title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--amber);
+  }
+  .rule-card__text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  /* ── Consent method ── */
+  .consent-card {
+    padding: 16px 20px;
+  }
+  .consent-card__icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  .consent-card__title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .consent-card__desc {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ── Checklist ── */
+  .checklist-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-item__check {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 2px solid var(--border-light);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .checklist-item__check--done {
+    background: var(--green-bg);
+    border-color: var(--green-border);
+    color: var(--green);
+  }
+  .checklist-item__text {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .checklist-item__text strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* ── Cost table ── */
+  .cost-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  .cost-table th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cost-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--text-secondary);
+  }
+  .cost-table tr:last-child td { border-bottom: none; }
+  .cost-table .cost-label { color: var(--text-primary); font-weight: 500; }
+  .cost-table .cost-value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+  .cost-table .cost-highlight {
+    color: var(--green);
+    font-weight: 600;
+  }
+  .cost-table .cost-compare {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* ── Timeline ── */
+  .timeline {
+    display: flex;
+    gap: 0;
+    position: relative;
+    padding: 24px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 42px;
+    left: 24px;
+    right: 24px;
+    height: 2px;
+    background: var(--border);
+  }
+  .timeline__step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 0 8px;
+  }
+  .timeline__dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px solid var(--blue-border);
+    margin: 0 auto 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .timeline__dot--active {
+    background: var(--blue);
+    border-color: var(--blue);
+  }
+  .timeline__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+  }
+  .timeline__time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  @media (max-width: 600px) {
+    .timeline { flex-direction: column; gap: 20px; padding: 0 0 0 20px; }
+    .timeline::before {
+      top: 8px; bottom: 8px; left: 26px; right: auto;
+      width: 2px; height: auto;
+    }
+    .timeline__step { text-align: left; padding: 0; display: flex; gap: 12px; align-items: flex-start; }
+    .timeline__dot { margin: 4px 0 0 0; flex-shrink: 0; }
+  }
+
+  /* ── Penalty card ── */
+  .penalty-banner {
+    background: linear-gradient(135deg, rgba(248,113,113,0.12) 0%, rgba(248,113,113,0.04) 100%);
+    border: 1px solid var(--red-border);
+    border-radius: var(--radius);
+    padding: 28px 28px;
+    text-align: center;
+  }
+  .penalty-banner__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+  .penalty-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 600px) { .penalty-grid { grid-template-columns: 1fr; } }
+  .penalty-stat {
+    padding: 16px;
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--radius-sm);
+  }
+  .penalty-stat__value {
+    font-size: 26px;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--red);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .penalty-stat__label {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .penalty-note {
+    margin-top: 18px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .penalty-note strong { color: var(--red); }
+
+  /* ── Template messages ── */
+  .template-msg {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    position: relative;
+    margin-bottom: 12px;
+    font-family: var(--font-sans);
+  }
+  .template-msg::before {
+    content: attr(data-label);
+    position: absolute;
+    top: -8px;
+    left: 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 1px 8px;
+    border-radius: 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .template-msg em {
+    color: var(--amber);
+    font-style: normal;
+    font-weight: 500;
+  }
+  .template-msg .opt-out {
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  /* ── Vetting tips ── */
+  .vetting-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 600px) { .vetting-grid { grid-template-columns: 1fr; } }
+  .vetting-card { padding: 20px; }
+  .vetting-card__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .vetting-card__icon { font-size: 16px; }
+  .vetting-card__title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .vetting-card--include .vetting-card__title { color: var(--green); }
+  .vetting-card--exclude .vetting-card__title { color: var(--red); }
+  .vetting-list {
+    list-style: none;
+    padding: 0;
+  }
+  .vetting-list li {
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .vetting-list li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .vetting-card--include .vetting-list li::before { background: var(--green); }
+  .vetting-card--exclude .vetting-list li::before { background: var(--red); }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    margin-top: 48px;
+  }
+  .footer__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .footer__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+  .footer-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .footer-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid;
+  }
+  .footer-chip--blue { color: var(--blue); border-color: var(--blue-border); background: var(--blue-bg); }
+  .footer-chip--amber { color: var(--amber); border-color: var(--amber-border); background: var(--amber-bg); }
+  .footer-chip--red { color: var(--red); border-color: var(--red-border); background: var(--red-bg); }
+  .footer-chip--green { color: var(--green); border-color: var(--green-border); background: var(--green-bg); }
+  .footer-chip__icon { font-size: 13px; }
+
+  .footer__note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 700px;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card, .penalty-banner, .template-msg { break-inside: avoid; }
+    .section { break-inside: avoid; }
+  }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header class="header">
+  <div class="header__badge">Compliance Reference</div>
+  <h1>Cold Outreach Texting<br>Cheat Sheet</h1>
+  <p class="header__subtitle">Resource Realty — Houston, TX<br>What Justin &amp; Jordan Need to Know Before Texting Anyone</p>
+  <div class="header__meta">Last updated: September 2026 &nbsp;·&nbsp; A2P 10DLC Compliance</div>
+</header>
+
+<main class="container">
+
+<!-- ═══════════ QUICK EXPLAINER ═══════════ -->
+<section class="section">
+  <div class="section__label">01 — Quick Explainer</div>
+  <div class="section__title">What Is A2P 10DLC?</div>
+  <div class="card card--blue">
+    <p style="font-size:14.5px; color:var(--text-secondary); line-height:1.7; margin:0;">
+      <strong style="color:var(--blue);">A2P</strong> (Application-to-Person) SMS is any text sent from software — like Twilio, your CRM, or a dialer — not from a personal phone. <strong style="color:var(--blue);">10DLC</strong> (10-Digit Long Code) is the standard local phone number format used for this traffic. Since <strong style="color:var(--red);">August 31, 2023</strong>, all major carriers block unregistered A2P traffic. If Resource Realty's numbers aren't registered, <strong style="color:var(--red);">every text you send gets dropped silently</strong> — or worse, flagged for spam and blacklisted.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════ GREEN ZONE / RED ZONE ═══════════ -->
+<section class="section">
+  <div class="section__label">02 — What You Can vs. Can't Text</div>
+  <div class="section__title">Green Zone &amp; Red Zone</div>
+  <div class="grid-2">
+
+    <!-- GREEN ZONE -->
+    <div class="card card--green">
+      <div class="zone-header">
+        <div class="zone-header__icon zone-header__icon--green">✓</div>
+        <div class="zone-header__text">
+          <h3 style="color:var(--green);">Safe Zone</h3>
+          <p>Text these without worry</p>
+        </div>
+      </div>
+      <div class="zone-item">
+        <div class="zone-item__title">Responding to deal inquiries</div>
+        <div class="zone-item__desc">They reached out first — implied consent covers you.</div>
+        <span class="zone-item__tag zone-item__tag--safe">Implied Consent</span>
+      </div>
+      <div class="zone-item">
+        <div class="zone-item__title">Follow-ups with existing clients</div>
+        <div class="zone-item__desc">Existing Business Relationship (EBR) — valid for 18 months from close.</div>
+        <span class="zone-item__tag zone-item__tag--safe">EBR — 18 Months</span>
+      </div>
+      <div class="zone-item">
+        <div class="zone-item__title">Updates on deals they inquired about</div>
+        <div class="zone-item__desc">They asked about a property — you're providing info they requested.</div>
+        <span class="zone-item__tag zone-item__tag--safe">Express Consent</span>
+      </div>
+      <div class="zone-item">
+        <div class="zone-item__title">Marketing to past clients</div>
+        <div class="zone-item__desc">EBR window + always honor opt-outs immediately.</div>
+        <span class="zone-item__tag zone-item__tag--safe">EBR + Opt-Out</span>
+      </div>
+    </div>
+
+    <!-- RED ZONE -->
+    <div class="card card--red">
+      <div class="zone-header">
+        <div class="zone-header__icon zone-header__icon--red">✕</div>
+        <div class="zone-header__text">
+          <h3 style="color:var(--red);">Danger Zone</h3>
+          <p>Text these and you're exposed</p>
+        </div>
+      </div>
+      <div class="zone-item">
+        <div class="zone-item__title">FSBO/Expired leads with no prior contact</div>
+        <div class="zone-item__desc">A yard sign or listing does NOT constitute consent to text.</div>
+        <span class="zone-item__tag zone-item__tag--danger">High Risk</span>
+      </div>
+      <div class="zone-item">
+        <div class="zone-item__title">Cold texting about deals to unknown contacts</div>
+        <div class="zone-item__desc">Zero relationship = zero consent. This is the #1 lawsuit trigger.</div>
+        <span class="zone-item__tag zone-item__tag--danger">Very High Risk — Not Allowed</span>
+      </div>
+      <div class="zone-item">
+        <div class="zone-item__title">Any purchased or rented contact lists</div>
+        <div class="zone-item__desc">Carrier rules explicitly prohibit this. No exceptions.</div>
+        <span class="zone-item__tag zone-item__tag--danger">Prohibited</span>
+      </div>
+      <div class="zone-item">
+        <div class="zone-item__title">Texting numbers from skip-tracing tools</div>
+        <div class="zone-item__desc">Bought data ≠ consent. TCPA applies regardless of how you got the number.</div>
+        <span class="zone-item__tag zone-item__tag--danger">Very High Risk</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ THE 5 RULES ═══════════ -->
+<section class="section">
+  <div class="section__label">03 — The 5 Rules That Matter</div>
+  <div class="section__title">Compliance Non-Negotiables</div>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card card--amber rule-card">
+      <div class="rule-card__number">1</div>
+      <div class="rule-card__title">Opt-Out Language</div>
+      <div class="rule-card__text">Every first message must include <strong style="color:var(--amber);">"Reply STOP to opt out"</strong>. Honor STOP and all variants within 10 business days. No exceptions.</div>
+    </div>
+    <div class="card card--amber rule-card">
+      <div class="rule-card__number">2</div>
+      <div class="rule-card__title">Quiet Hours</div>
+      <div class="rule-card__text">No texts before <strong style="color:var(--amber);">8:00 AM</strong> or after <strong style="color:var(--amber);">9:00 PM</strong> in the <strong style="color:var(--amber);">recipient's</strong> timezone — not yours.</div>
+    </div>
+  </div>
+  <div class="grid-3">
+    <div class="card card--amber rule-card">
+      <div class="rule-card__number">3</div>
+      <div class="rule-card__title">Consent Documentation</div>
+      <div class="rule-card__text">Must be documented with: timestamp, method, phone number, identity, and campaign name.</div>
+    </div>
+    <div class="card card--amber rule-card">
+      <div class="rule-card__number">4</div>
+      <div class="rule-card__title">National DNC Registry</div>
+      <div class="rule-card__text">The National Do Not Call Registry applies to SMS per 2025–2026 court rulings. Check it.</div>
+    </div>
+    <div class="card card--amber rule-card">
+      <div class="rule-card__number">5</div>
+      <div class="rule-card__title">Keep Records</div>
+      <div class="rule-card__text">Retain consent records with timestamps, source, and campaign for at least 4 years.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ HOW TO GET CONSENT ═══════════ -->
+<section class="section">
+  <div class="section__label">04 — How to Get Consent (Legally)</div>
+  <div class="section__title">Building Your Opt-In List</div>
+  <div class="section__desc">These are the practical, legal ways to earn texting permission. Each one gives you documented consent.</div>
+  <div class="grid-2">
+    <div class="card card--green consent-card">
+      <div class="consent-card__icon">📝</div>
+      <div class="consent-card__title">Web Form Checkbox</div>
+      <div class="consent-card__desc">Unchecked by default, voluntary. Lead fills out your form → opted in → can text.</div>
+    </div>
+    <div class="card card--green consent-card">
+      <div class="consent-card__icon">💬</div>
+      <div class="consent-card__title">"Text Me" on a Call</div>
+      <div class="consent-card__desc">They say "text me" during a conversation → express consent → can text immediately.</div>
+    </div>
+    <div class="card card--green consent-card">
+      <div class="consent-card__icon">📧</div>
+      <div class="consent-card__title">Email Response</div>
+      <div class="consent-card__desc">They reply to your email → express consent. Document the email thread as proof.</div>
+    </div>
+    <div class="card card--green consent-card">
+      <div class="consent-card__icon">🔑</div>
+      <div class="consent-card__title">SMS Keyword Opt-In</div>
+      <div class="consent-card__desc">They text a keyword to your number → express written consent. Best practice: double opt-in.</div>
+    </div>
+    <div class="card card--green consent-card">
+      <div class="consent-card__icon">✍️</div>
+      <div class="consent-card__title">Signed Written Consent</div>
+      <div class="consent-card__desc">A physical or digital form they sign. Strongest possible consent for audit defense.</div>
+    </div>
+    <div class="card card--green consent-card">
+      <div class="consent-card__icon">📱</div>
+      <div class="consent-card__title">Double Opt-In</div>
+      <div class="consent-card__desc">They opt in → you send a confirmation text → they confirm. Gold standard for compliance.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ REGISTRATION CHECKLIST ═══════════ -->
+<section class="section">
+  <div class="section__label">05 — Registration Steps</div>
+  <div class="section__title">Twilio A2P 10DLC Checklist</div>
+  <div class="card">
+    <div class="checklist-item">
+      <div class="checklist-item__check checklist-item__check--done">✓</div>
+      <div class="checklist-item__text"><strong>Confirm EIN</strong> — Resource Realty needs a valid Tax ID for brand registration.</div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-item__check"></div>
+      <div class="checklist-item__text"><strong>Go to Twilio Console → Messaging → Regulatory Compliance → A2P 10DLC</strong></div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-item__check"></div>
+      <div class="checklist-item__text"><strong>Create Business Profile</strong> — Legal name must match EIN records exactly.</div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-item__check"></div>
+      <div class="checklist-item__text"><strong>Register Brand</strong> — "Low Volume Standard Brand" ($4.50 one-time). TCR verifies against public records.</div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-item__check"></div>
+      <div class="checklist-item__text"><strong>Wait for Brand Verification</strong> — 1–5 business days.</div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-item__check"></div>
+      <div class="checklist-item__text"><strong>Create Messaging Service</strong> — Add your 10DLC numbers to it.</div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-item__check"></div>
+      <div class="checklist-item__text"><strong>Submit Campaign</strong> — "Low Volume Mixed" ($1.50/mo + $15 vetting). Include use case, message samples, opt-in/opt-out info.</div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-item__check"></div>
+      <div class="checklist-item__text"><strong>Wait for Campaign Approval</strong> — 2–3 weeks. Don't describe cold outreach as the campaign purpose.</div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-item__check"></div>
+      <div class="checklist-item__text"><strong>Start Sending</strong> — Only to opted-in contacts. Include opt-out in every first message.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ COSTS ═══════════ -->
+<section class="section">
+  <div class="section__label">06 — Costs</div>
+  <div class="section__title">What This Actually Costs</div>
+  <div class="grid-2">
+    <div class="card">
+      <table class="cost-table">
+        <thead>
+          <tr><th>Item</th><th>Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cost-label">Brand Registration</td>
+            <td class="cost-value">$4.50 <span class="cost-compare">one-time</span></td>
+          </tr>
+          <tr>
+            <td class="cost-label">Campaign Vetting</td>
+            <td class="cost-value">$15.00 <span class="cost-compare">one-time</span></td>
+          </tr>
+          <tr>
+            <td class="cost-label">Monthly Campaign Fee</td>
+            <td class="cost-value">$1.50 <span class="cost-compare">/month</span></td>
+          </tr>
+          <tr>
+            <td class="cost-label">Per-Number Fee</td>
+            <td class="cost-value">~$0.01 <span class="cost-compare">/month</span></td>
+          </tr>
+          <tr>
+            <td class="cost-label">Per Outbound Message</td>
+            <td class="cost-value">~$0.0079 <span class="cost-compare">/msg</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="display:flex; flex-direction:column; justify-content:center; gap:16px;">
+      <div style="text-align:center; padding:16px; background:rgba(52,211,153,0.08); border-radius:var(--radius-sm); border:1px solid var(--green-border);">
+        <div style="font-family:var(--font-mono); font-size:28px; font-weight:800; color:var(--green); letter-spacing:-0.02em;">$37.62</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Year 1 Total</div>
+      </div>
+      <div style="text-align:center; padding:16px; background:rgba(96,165,250,0.08); border-radius:var(--radius-sm); border:1px solid var(--blue-border);">
+        <div style="font-family:var(--font-mono); font-size:28px; font-weight:800; color:var(--blue); letter-spacing:-0.02em;">$18.12</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Year 2+ Per Year</div>
+      </div>
+      <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.02); border-radius:var(--radius-sm); border:1px solid var(--border);">
+        <div style="font-family:var(--font-mono); font-size:13px; color:var(--text-muted);">vs. <span style="color:var(--red); text-decoration:line-through;">$181</span> <span style="color:var(--text-secondary);">Standard Campaign Year 1</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ TIMELINE ═══════════ -->
+<section class="section">
+  <div class="section__label">07 — Timeline</div>
+  <div class="section__title">Getting Registered: ~3–4 Weeks</div>
+  <div class="card">
+    <div class="timeline">
+      <div class="timeline__step">
+        <div class="timeline__dot timeline__dot--active"></div>
+        <div class="timeline__label">Gather Info</div>
+        <div class="timeline__time">1–2 days</div>
+      </div>
+      <div class="timeline__step">
+        <div class="timeline__dot timeline__dot--active"></div>
+        <div class="timeline__label">Submit Brand</div>
+        <div class="timeline__time">15 min</div>
+      </div>
+      <div class="timeline__step">
+        <div class="timeline__dot"></div>
+        <div class="timeline__label">Brand Verified</div>
+        <div class="timeline__time">1–5 biz days</div>
+      </div>
+      <div class="timeline__step">
+        <div class="timeline__dot timeline__dot--active"></div>
+        <div class="timeline__label">Submit Campaign</div>
+        <div class="timeline__time">15 min</div>
+      </div>
+      <div class="timeline__step">
+        <div class="timeline__dot"></div>
+        <div class="timeline__label">Campaign Approved</div>
+        <div class="timeline__time">2–3 weeks</div>
+      </div>
+      <div class="timeline__step">
+        <div class="timeline__dot timeline__dot--active"></div>
+        <div class="timeline__label">Start Sending</div>
+        <div class="timeline__time">✓</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PENALTY CARD ═══════════ -->
+<section class="section">
+  <div class="section__label">08 — Penalties</div>
+  <div class="section__title">What Non-Compliance Actually Costs</div>
+  <div class="penalty-banner">
+    <div class="penalty-banner__title">⚠️ TCPA Penalties — No Cap on Total Damages</div>
+    <div class="penalty-grid">
+      <div class="penalty-stat">
+        <div class="penalty-stat__value">$500</div>
+        <div class="penalty-stat__label">Per text — negligent violation</div>
+      </div>
+      <div class="penalty-stat">
+        <div class="penalty-stat__value">$1,500</div>
+        <div class="penalty-stat__label">Per text — willful violation</div>
+      </div>
+      <div class="penalty-stat">
+        <div class="penalty-stat__value">$150K</div>
+        <div class="penalty-stat__label">100 cold texts = max exposure</div>
+      </div>
+    </div>
+    <p class="penalty-note">
+      TCPA lawsuits against real estate companies surged <strong>~95%</strong> through mid-2025.
+      Georgia ruling (March 2026): unsolicited real estate texts <strong>ARE</strong> telephone solicitations under TCPA.
+      New Jersey bill S885: penalties up to <strong>$10,000 per violation</strong>.
+      Attorneys specifically target real estate brokerages for cold texting.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════ TEMPLATE MESSAGES ═══════════ -->
+<section class="section">
+  <div class="section__label">09 — Template Messages</div>
+  <div class="section__title">Copy-Ready Texts</div>
+  <div class="section__desc">These include all required compliance language. Personalize the <em style="color:var(--amber);">bracketed</em> parts.</div>
+
+  <div class="template-msg" data-label="First Contact — Express Consent">
+    Hi <em>[Name]</em>, this is Jordan from Resource Realty. You asked about <em>[property/address]</em> — I have some updates for you. Want me to send details? <span class="opt-out">Reply STOP to opt out.</span> Message and data rates may apply.
+  </div>
+
+  <div class="template-msg" data-label="Follow-Up — Existing Client">
+    Hey <em>[Name]</em>, just checking in on <em>[deal/transaction]</em>. Anything you need from me this week? — <em>Justin</em>, Resource Realty. <span class="opt-out">Reply STOP to opt out.</span> Message and data rates may apply.
+  </div>
+
+  <div class="template-msg" data-label="Post-Inquiry Update">
+    Hi <em>[Name]</em>, quick update on <em>[property]</em> you inquired about — <em>[brief update]</em>. Let me know if you have questions! — Resource Realty. <span class="opt-out">Reply STOP to opt out.</span> Message and data rates may apply.
+  </div>
+
+  <div class="template-msg" data-label="EBR Marketing — Past Client">
+    Hi <em>[Name]</em>, it's Jordan from Resource Realty! We just listed <em>[property highlight]</em> and thought of you. Interested in taking a look? <span class="opt-out">Reply STOP to opt out.</span> Message and data rates may apply.
+  </div>
+
+  <div class="template-msg" data-label="Opt-Out Confirmation">
+    You've been unsubscribed from Resource Realty texts. You will no longer receive messages from this number. For questions, call <em>[brokerage phone]</em>.
+  </div>
+</section>
+
+<!-- ═══════════ CAMPAIGN VETTING TIPS ═══════════ -->
+<section class="section">
+  <div class="section__label">10 — Campaign Vetting Tips</div>
+  <div class="section__title">Getting Your Campaign Approved</div>
+  <div class="section__desc">TCR vetting is strict. One mistake = rejection and 2–3 week delay. Follow these rules.</div>
+  <div class="vetting-grid">
+    <div class="card card--green vetting-card vetting-card--include">
+      <div class="vetting-card__header">
+        <span class="vetting-card__icon">✓</span>
+        <span class="vetting-card__title">Include</span>
+      </div>
+      <ul class="vetting-list">
+        <li>Legal business name matching EIN exactly</li>
+        <li>Message samples that match what you'll actually send</li>
+        <li>Use "Message and data rates may apply" <strong style="color:var(--green);">verbatim</strong></li>
+        <li>Privacy Policy URL (required after June 30, 2026)</li>
+        <li>Terms &amp; Conditions URL (required after June 30, 2026)</li>
+        <li>Clear opt-in/opt-out process description</li>
+        <li>Accurate use case: "client follow-up" or "inquiry responses"</li>
+      </ul>
+    </div>
+    <div class="card card--red vetting-card vetting-card--exclude">
+      <div class="vetting-card__header">
+        <span class="vetting-card__icon">✕</span>
+        <span class="vetting-card__title">Exclude / Never Say</span>
+      </div>
+      <ul class="vetting-list">
+        <li>Never describe cold outreach as campaign purpose — TCR rejects it</li>
+        <li>Don't bundle opt-ins across multiple campaigns</li>
+        <li>Don't use generic or vague message samples</li>
+        <li>Don't skip the Privacy Policy or T&amp;C URLs</li>
+        <li>Don't use a different business name than your EIN record</li>
+        <li>Don't claim opt-in methods you don't actually use</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════ QUICK REFERENCE FOOTER ═══════════ -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__label">Quick Reference</div>
+    <div class="footer-chips">
+      <span class="footer-chip footer-chip--blue">
+        <span class="footer-chip__icon">🕐</span> Quiet Hours: 8AM – 9PM (Recipient's TZ)
+      </span>
+      <span class="footer-chip footer-chip--red">
+        <span class="footer-chip__icon">💰</span> $500 – $1,500 Per Violation Text
+      </span>
+      <span class="footer-chip footer-chip--amber">
+        <span class="footer-chip__icon">📋</span> EBR Window: 18 Months from Close
+      </span>
+      <span class="footer-chip footer-chip--green">
+        <span class="footer-chip__icon">🛑</span> Always Include: Reply STOP to Opt Out
+      </span>
+      <span class="footer-chip footer-chip--blue">
+        <span class="footer-chip__icon">📊</span> EBR from Inquiry: 3 Months
+      </span>
+      <span class="footer-chip footer-chip--red">
+        <span class="footer-chip__icon">⚖️</span> TCPA Lawsuits ↑95% in Real Estate
+      </span>
+    </div>
+    <p class="footer__note">
+      This cheat sheet is for internal reference only and does not constitute legal advice.
+      Consult a TCPA attorney for compliance guidance specific to your situation.
+      Resource Realty · Houston, TX · Jordan &amp; Justin
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,37 +1,53 @@
 interface ZoomControlsProps {
-  zoom: number;
-  onZoomChange: (zoom: number) => void;
-  axis: 'x' | 'y';
-  onAxisChange: (axis: 'x' | 'y') => void;
+  ticksPerSecond: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onTicksChange: (tps: number) => void;
 }
 
-const ZOOM_MIN = 25;
-const ZOOM_MAX = 400;
-const ZOOM_STEP = 25;
+const PRESETS = [
+  { label: '0.01x', tps: 0.2 },
+  { label: '0.1x', tps: 1 },
+  { label: '1x', tps: 2 },
+  { label: '5x', tps: 10 },
+  { label: '50x', tps: 50 },
+];
 
-export default function ZoomControls({ zoom, onZoomChange, axis, onAxisChange }: ZoomControlsProps) {
-  const handleZoomIn = () => onZoomChange(Math.min(zoom + ZOOM_STEP, ZOOM_MAX));
-  const handleZoomOut = () => onZoomChange(Math.max(zoom - ZOOM_STEP, ZOOM_MIN));
-  const handleAxisToggle = () => onAxisChange(axis === 'x' ? 'y' : 'x');
-
+export default function ZoomControls({
+  ticksPerSecond,
+  onZoomIn,
+  onZoomOut,
+  onTicksChange,
+}: ZoomControlsProps) {
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex items-center gap-1 rounded-lg border border-border bg-bg-card px-2 py-1 shadow-lg">
+    <div className="flex items-center gap-2">
+      {/* Zoom out */}
       <button
-        onClick={handleZoomOut}
-        className="flex h-7 w-7 items-center justify-center rounded text-text hover:bg-bg-card-alt"
-        aria-label="Zoom out"
+        onClick={onZoomOut}
+        className="flex items-center justify-center w-7 h-7 rounded text-text-muted hover:text-text hover:bg-bg-card-alt transition-colors"
+        title="Zoom out"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
           <line x1="3" y1="7" x2="11" y2="7" />
         </svg>
       </button>
 
-      <span className="min-w-[3rem] text-center text-xs text-text-muted">{zoom}%</span>
+      {/* Slider */}
+      <input
+        type="range"
+        min={0.2}
+        max={100}
+        step={0.1}
+        value={ticksPerSecond}
+        onChange={(e) => onTicksChange(parseFloat(e.target.value))}
+        className="w-24"
+      />
 
+      {/* Zoom in */}
       <button
-        onClick={handleZoomIn}
-        className="flex h-7 w-7 items-center justify-center rounded text-text hover:bg-bg-card-alt"
-        aria-label="Zoom in"
+        onClick={onZoomIn}
+        className="flex items-center justify-center w-7 h-7 rounded text-text-muted hover:text-text hover:bg-bg-card-alt transition-colors"
+        title="Zoom in"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
           <line x1="3" y1="7" x2="11" y2="7" />
@@ -39,19 +55,22 @@ export default function ZoomControls({ zoom, onZoomChange, axis, onAxisChange }:
         </svg>
       </button>
 
-      <div className="mx-1 h-5 w-px bg-border" />
-
-      <button
-        onClick={handleAxisToggle}
-        className="flex h-7 items-center gap-1 rounded px-2 text-xs text-text hover:bg-bg-card-alt"
-        aria-label={`Switch to time-on-${axis === 'x' ? 'Y' : 'X'} layout`}
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M3 11V3h8" />
-          <path d="M3 11l3-3 2 2 3-4" />
-        </svg>
-        {axis === 'x' ? 'Time→X' : 'Time→Y'}
-      </button>
+      {/* Preset buttons */}
+      <div className="flex gap-1 ml-2">
+        {PRESETS.map((preset) => (
+          <button
+            key={preset.label}
+            onClick={() => onTicksChange(preset.tps)}
+            className={`px-2 py-0.5 text-[10px] rounded transition-colors ${
+              Math.abs(ticksPerSecond - preset.tps) < 0.1
+                ? 'bg-pink text-white'
+                : 'text-text-muted hover:text-text hover:bg-bg-card-alt'
+            }`}
+          >
+            {preset.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
