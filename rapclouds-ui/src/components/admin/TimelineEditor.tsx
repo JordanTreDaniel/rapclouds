@@ -98,27 +98,20 @@ export default function TimelineEditor({ words, onTimingSave }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isPlaying, play, pause]);
 
-  // Auto-scroll to keep active word centered
+  // Auto-scroll to keep playhead centered in viewport
   useEffect(() => {
-    if (!isPlaying || !scrollRef.current) return;
+    if (!scrollRef.current) return;
 
-    const activeIdx = localWords.findIndex(
-      (w) => currentTime >= w.start && currentTime <= w.end,
-    );
+    const container = scrollRef.current;
+    const viewportCenter = container.clientWidth / 2;
+    const playheadPx = currentTime * pxPerSecond;
+    const targetScroll = playheadPx - viewportCenter;
 
-    if (activeIdx >= 0) {
-      const activeWord = localWords[activeIdx];
-      const wordCenterPx = (activeWord.start + activeWord.end) / 2 * pxPerSecond;
-      const container = scrollRef.current;
-      const viewportCenter = container.clientWidth / 2;
-      const targetScroll = wordCenterPx - viewportCenter;
-
-      container.scrollTo({
-        left: targetScroll,
-        behavior: 'auto',
-      });
-    }
-  }, [currentTime, isPlaying, localWords, pxPerSecond]);
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'auto',
+    });
+  }, [currentTime, pxPerSecond]);
 
   // Timeline click to seek
   const handleTimelineClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {

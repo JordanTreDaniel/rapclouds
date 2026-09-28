@@ -197,7 +197,7 @@ export default function Karaoke() {
 
       <audio ref={audio.audioRef} preload="auto" />
 
-      <div className="flex flex-col items-center px-4 py-8 max-w-[720px] mx-auto">
+      <div className={`flex flex-col items-center px-4 max-w-[720px] mx-auto ${view === 'performance' ? 'h-screen py-4' : 'py-8'}`}>
         {/* ── SETUP VIEW ── */}
         {view === 'setup' && (
           <>
@@ -223,7 +223,7 @@ export default function Karaoke() {
 
         {/* ── PERFORMANCE VIEW ── */}
         {view === 'performance' && (
-          <>
+          <div className="flex flex-col w-full flex-1 min-h-0">
             {sections.length > 0 && (
               <SectionPicker
                 sections={sections}
@@ -234,7 +234,7 @@ export default function Karaoke() {
 
             {/* Progress bar */}
             <div
-              className="w-full h-[3px] rounded-sm mb-3 overflow-hidden"
+              className="w-full h-[3px] rounded-sm mb-3 overflow-hidden flex-none"
               style={{ background: 'var(--color-bg-card-alt)' }}
             >
               <div
@@ -248,14 +248,43 @@ export default function Karaoke() {
               />
             </div>
 
-            <LyricsDisplay
-              words={filteredWords}
-              currentTime={audio.currentTime}
-              clipStart={selectedSection?.start ?? null}
-              clipEnd={selectedSection?.end ?? null}
-              isPlaying={recording.isRecording}
-            />
+            {/* Lyrics fill remaining space */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <LyricsDisplay
+                words={filteredWords}
+                currentTime={audio.currentTime}
+                clipStart={selectedSection?.start ?? null}
+                clipEnd={selectedSection?.end ?? null}
+                isPlaying={recording.isRecording}
+              />
+            </div>
 
+            {/* Mute hint */}
+            <div className="text-center text-xs flex-none py-2" style={{ color: 'var(--color-text-muted)' }}>
+              {audio.isMuted
+                ? 'Song muted — lyrics sync still active'
+                : 'Song audio on — use headphones for best results'}
+            </div>
+          </div>
+        )}
+
+        {/* ── GRADE VIEW ── */}
+        {view === 'grade' && gradeResult && (
+          <GradeCard grade={gradeResult} onRetry={handleRetry} onHome={handleBack} />
+        )}
+      </div>
+
+      {/* ── FIXED PLAYBACK CONTROLS ── */}
+      {view === 'performance' && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-50 flex justify-center pointer-events-none"
+          style={{
+            background: 'linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0.92) 55%, transparent 100%)',
+            paddingTop: '80px',
+            paddingBottom: '28px',
+          }}
+        >
+          <div className="pointer-events-auto">
             <RecordingControls
               isRecording={recording.isRecording}
               isMuted={audio.isMuted}
@@ -265,20 +294,9 @@ export default function Karaoke() {
               onBack={handleBack}
               canStart={!!groundTruth}
             />
-
-            <div className="text-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
-              {audio.isMuted
-                ? 'Song muted — lyrics sync still active'
-                : 'Song audio on — use headphones for best results'}
-            </div>
-          </>
-        )}
-
-        {/* ── GRADE VIEW ── */}
-        {view === 'grade' && gradeResult && (
-          <GradeCard grade={gradeResult} onRetry={handleRetry} onHome={handleBack} />
-        )}
-      </div>
+          </div>
+        </div>
+      )}
 
       <Countdown active={countdownActive} onDone={() => { setCountdownActive(false); handleCountdownDone(); }} />
       <GradingSpinner active={gradingActive} />
