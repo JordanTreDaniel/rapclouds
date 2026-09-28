@@ -1,0 +1,27 @@
+[
+  {
+    "label": "intro",
+    "start": 0.0,
+    "end": 11.0
+  },
+  {
+    "label": "verse",
+    "start": 11.0,
+    "end": 95.0
+  },
+  {
+    "label": "chorus",
+    "start": 95.0,
+    "end": 147.0
+  },
+  {
+    "label": "bridge",
+    "start": 147.0,
+    "end": 169.0
+  },
+  {
+    "label": "outro",
+    "start": 169.0,
+    "end": 195.0
+  }
+]

@@ -74,6 +74,13 @@ RAP_STOPWORDS.update([
     "jcolepowertripllyrics", "jcolepowertripfeatmiguellyrics",
     "albumcovers", "thumbjpg", "lyrics", "suggesteditsong",
     "fayettevi",  # Spelled-out "Fayetteville" in lyrics
+    # Spanish stopwords (common function words in song lyrics)
+    "de", "la", "el", "en", "que", "los", "las", "un", "una", "por", "con",
+    "no", "se", "del", "al", "y", "o", "pero", "más", "ya", "le", "me",
+    "te", "mi", "tu", "su", "para", "es", "lo", "si", "sin", "sobre",
+    "también", "este", "esta", "ese", "esa", "fue", "son", "han", "e",
+    "ni", "mí", "ti", "nos", "os", "les", "yo", "él", "ella", "ellos",
+    "nosotros", "como", "hay", "todo", "muy", "ante", "desde", "hasta",
 ])
 
 
@@ -122,11 +129,15 @@ def clean_lyrics(lyrics, include_numbers=True):
     text = re.sub(r"needs a fix.*", "", text)
     # Generic: remove lines that are clearly metadata (short, contain 'lyrics' alone)
     text = re.sub(r"\blyrics\b", "", text)
-    # Remove non-alpha chars (keep spaces)
+    # Spanish metadata from YouTube/Whisper transcriptions
+    text = re.sub(r"subtitulos?\s*(?:realizados?\s*)?por.*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"letras\s+de\s+canciones.*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"¿?estas\s+letras\s+son\s+correctas.*", "", text, flags=re.IGNORECASE)
+    # Remove non-alpha chars (keep spaces) — preserve accented Latin characters
     if not include_numbers:
-        text = re.sub(r"[^a-z\s]", "", text)
+        text = re.sub(r"[^a-záéíóúüñàèìòùâêîôûäëïöüãõçß\s]", "", text)
     else:
-        text = re.sub(r"[^a-z0-9\s]", "", text)
+        text = re.sub(r"[^a-z0-9áéíóúüñàèìòùâêîôûäëïöüãõçß\s]", "", text)
     # Collapse whitespace
     text = re.sub(r"\s+", " ", text).strip()
     # Filter out any remaining long tokens (>15 chars = metadata artifact)
