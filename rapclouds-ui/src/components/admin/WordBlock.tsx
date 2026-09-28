@@ -31,8 +31,9 @@ export default function WordBlock({
 
   return (
     <div
+      data-testid="word-block"
       className={`
-        group absolute top-1/2 -translate-y-1/2 h-12 rounded-lg border cursor-grab select-none
+        group absolute top-1/2 -translate-y-1/2 h-16 rounded-lg border cursor-grab select-none
         flex items-center justify-center transition-colors duration-150
         ${isActive
           ? 'bg-pink/20 border-pink shadow-[0_0_12px_rgba(255,20,147,0.4)] z-10'

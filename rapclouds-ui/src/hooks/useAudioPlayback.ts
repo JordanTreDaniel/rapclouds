@@ -25,6 +25,10 @@ export interface AudioPlayback {
   resetTime: () => void;
   /** Pause and reset to 0 */
   stop: () => void;
+  /** Current playback rate (1 = normal speed) */
+  playbackRate: number;
+  /** Set playback rate (e.g. 0.5 for half speed, 2 for double speed) */
+  setPlaybackRate: (rate: number) => void;
 }
 
 export function useAudioPlayback(): AudioPlayback {
@@ -34,6 +38,7 @@ export function useAudioPlayback(): AudioPlayback {
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [playbackRate, setPlaybackRateState] = useState(1);
 
   // RAF loop to track currentTime
   const animate = useCallback(() => {
@@ -53,10 +58,11 @@ export function useAudioPlayback(): AudioPlayback {
   const play = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    audio.playbackRate = playbackRate;
     audio.play();
     setIsPlaying(true);
     animate();
-  }, [animate]);
+  }, [animate, playbackRate]);
 
   const pause = useCallback(() => {
     const audio = audioRef.current;
@@ -109,6 +115,12 @@ export function useAudioPlayback(): AudioPlayback {
     cancelRaf();
   }, [cancelRaf]);
 
+  const setPlaybackRate = useCallback((rate: number) => {
+    setPlaybackRateState(rate);
+    const audio = audioRef.current;
+    if (audio) audio.playbackRate = rate;
+  }, []);
+
   // Update duration when loadedmetadata fires
   useEffect(() => {
     const audio = audioRef.current;
@@ -136,5 +148,7 @@ export function useAudioPlayback(): AudioPlayback {
     setMuted,
     resetTime,
     stop,
+    playbackRate,
+    setPlaybackRate,
   };
 }

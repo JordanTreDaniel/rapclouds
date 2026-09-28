@@ -16,8 +16,8 @@ export interface TimelineState {
   pxToTime: (px: number) => number;
   /** Snap a time to the nearest tick grid */
   snapToTick: (time: number) => number;
-  /** Get CSS style for a word block */
-  wordStyle: (word: Word) => React.CSSProperties;
+  /** Get tick positions for a given duration */
+  getTickPositions: (duration: number) => Array<{ time: number; x: number; isMajor: boolean }>;
   /** Set ticks per second */
   setTicksPerSecond: (tps: number) => void;
   /** Zoom in (increase ticks per second) */
@@ -63,15 +63,17 @@ export function useTimeline(): TimelineState {
     return Math.round(time / tickDuration) * tickDuration;
   }, [ticksPerSecond]);
 
-  const wordStyle = useCallback((word: Word): React.CSSProperties => {
-    const left = word.start * pxPerSecond;
-    const width = Math.max((word.end - word.start) * pxPerSecond, 40);
-    return {
-      position: 'absolute',
-      left: `${left}px`,
-      width: `${width}px`,
-    };
-  }, [pxPerSecond]);
+  const getTickPositions = useCallback((dur: number) => {
+    const ticks: Array<{ time: number; x: number; isMajor: boolean }> = [];
+    const count = Math.ceil(dur * ticksPerSecond) + 1;
+    for (let i = 0; i < count; i++) {
+      const time = i / ticksPerSecond;
+      const x = time * pxPerSecond;
+      const isMajor = ticksPerSecond >= 1 ? i % 2 === 0 : true;
+      ticks.push({ time, x, isMajor });
+    }
+    return ticks;
+  }, [ticksPerSecond, pxPerSecond]);
 
   const isNearActive = useCallback((word: Word, currentTime: number): boolean => {
     const buffer = 2; // 2s buffer
@@ -90,7 +92,7 @@ export function useTimeline(): TimelineState {
     timeToPx,
     pxToTime,
     snapToTick,
-    wordStyle,
+    getTickPositions,
     setTicksPerSecond,
     zoomIn,
     zoomOut,
@@ -99,7 +101,7 @@ export function useTimeline(): TimelineState {
     wordDuration,
   }), [
     ticksPerSecond, pxPerSecond, timeToPx, pxToTime, snapToTick,
-    wordStyle, setTicksPerSecond, zoomIn, zoomOut,
+    getTickPositions, setTicksPerSecond, zoomIn, zoomOut,
     isNearActive, totalWidth, wordDuration,
   ]);
 }

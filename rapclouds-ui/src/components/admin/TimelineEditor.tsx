@@ -22,14 +22,18 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wordsContainerRef = useRef<HTMLDivElement>(null);
 
+  const [showPlayhead, setShowPlayhead] = useState(false);
+
   const {
     ticksPerSecond, pxPerSecond, pxToTime, snapToTick,
     setTicksPerSecond, zoomIn, zoomOut, isNearActive,
+    getTickPositions,
   } = useTimeline();
 
   const {
     audioRef, currentTime, duration, isPlaying,
     play, pause, seek, loadSrc,
+    playbackRate, setPlaybackRate,
   } = useAudioPlayback();
 
   // Load audio source when URL changes
@@ -140,10 +144,37 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
     };
   }, []);
 
+  // Performance monitoring
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let rafId: number;
+
+    const measure = () => {
+      frameCount++;
+      const now = performance.now();
+      const elapsed = now - lastTime;
+
+      if (elapsed >= 1000) {
+        const fps = (frameCount / elapsed) * 1000;
+        console.log(`[Timeline Perf] FPS: ${fps.toFixed(1)}, Frame time: ${(elapsed / frameCount).toFixed(1)}ms`);
+        frameCount = 0;
+        lastTime = now;
+      }
+
+      rafId = requestAnimationFrame(measure);
+    };
+
+    rafId = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(rafId);
+  }, [isPlaying]);
+
   const totalTimelineWidth = duration * pxPerSecond;
 
   return (
-    <div className="flex flex-col h-full bg-bg">
+    <div className="flex flex-col h-full bg-bg" data-testid="timeline-editor">
       {/* Hidden audio element */}
       <audio ref={audioRef} preload="auto" />
 
@@ -158,6 +189,8 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
             onPlay={play}
             onPause={pause}
             onSeek={seek}
+            playbackRate={playbackRate}
+            onRateChange={setPlaybackRate}
           />
         </div>
 
@@ -166,6 +199,13 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
             <span className="text-xs text-pink animate-pulse">Saving…</span>
           )}
           <span className="text-xs text-text-muted">{localWords.length} words</span>
+          <button
+            onClick={() => setShowPlayhead(!showPlayhead)}
+            className={`text-xs px-2 py-1 rounded ${showPlayhead ? 'bg-pink text-white' : 'bg-bg-secondary text-text-muted'}`}
+            title={showPlayhead ? 'Hide playhead' : 'Show playhead'}
+          >
+            {showPlayhead ? '◆' : '◇'} Playhead
+          </button>
           <ZoomControls
             ticksPerSecond={ticksPerSecond}
             onZoomIn={zoomIn}
@@ -180,27 +220,23 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
         <div
           ref={scrollRef}
           id="timeline-scroll-ref"
+          data-testid="timeline-scroll"
           className="h-full overflow-x-auto overflow-y-hidden"
         >
           {/* Time axis */}
           <div className="sticky top-0 z-10 h-8 bg-bg-card border-b border-border flex items-end">
-            {Array.from({ length: Math.ceil(duration * ticksPerSecond) + 1 }, (_, i) => {
-              const time = i / ticksPerSecond;
-              const x = time * pxPerSecond;
-              const isMajor = i % (ticksPerSecond >= 1 ? 2 : 1) === 0;
-              return (
-                <div
-                  key={i}
-                  className="absolute bottom-0 flex flex-col items-center"
-                  style={{ left: `${x}px` }}
-                >
-                  <span className={`text-[10px] text-text-muted mb-1 ${isMajor ? 'opacity-100' : 'opacity-50'}`}>
-                    {time.toFixed(1)}s
-                  </span>
-                  <div className={`w-px ${isMajor ? 'h-3 bg-border-light' : 'h-2 bg-border'}`} />
-                </div>
-              );
-            })}
+            {getTickPositions(duration).map((tick) => (
+              <div
+                key={tick.time}
+                className="absolute bottom-0 flex flex-col items-center"
+                style={{ left: `${tick.x}px` }}
+              >
+                <span className={`text-sm font-medium text-text ${tick.isMajor ? 'opacity-100' : 'opacity-40'}`}>
+                  {tick.time.toFixed(1)}s
+                </span>
+                <div className={`w-px ${tick.isMajor ? 'h-4 bg-border-light' : 'h-2 bg-border'}`} />
+              </div>
+            ))}
           </div>
 
           {/* Words container */}
@@ -211,16 +247,13 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
             onClick={handleTimelineClick}
           >
             {/* Grid lines */}
-            {Array.from({ length: Math.ceil(duration * ticksPerSecond) + 1 }, (_, i) => {
-              const x = (i / ticksPerSecond) * pxPerSecond;
-              return (
-                <div
-                  key={i}
-                  className="absolute top-0 bottom-0 w-px bg-border/30"
-                  style={{ left: `${x}px` }}
-                />
-              );
-            })}
+            {getTickPositions(duration).map((tick) => (
+              <div
+                key={tick.time}
+                className="absolute top-0 bottom-0 w-px bg-border/30"
+                style={{ left: `${tick.x}px` }}
+              />
+            ))}
 
             {/* Word blocks */}
             {localWords.map((word, index) => (
@@ -239,9 +272,11 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
         </div>
 
         {/* Fixed playhead — centered in viewport, content scrolls underneath */}
-        <div className="absolute top-0 bottom-0 z-30 pointer-events-none" style={{ left: '50%' }}>
-          <Playhead />
-        </div>
+        {showPlayhead && (
+          <div className="absolute top-0 bottom-0 z-30 pointer-events-none" style={{ left: '50%' }}>
+            <Playhead />
+          </div>
+        )}
       </div>
     </div>
   );
