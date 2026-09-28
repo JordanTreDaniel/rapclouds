@@ -52,24 +52,52 @@ export default function LyricsDisplay({ words, currentTime, clipStart, clipEnd, 
 
   const lines = useMemo(() => groupWordsIntoLines(filteredWords), [filteredWords]);
 
-  // Auto-scroll to active line
+  // Smooth auto-scroll to center the active line
   useEffect(() => {
     if (!boxRef.current || !isPlaying) return;
-    const active = boxRef.current.querySelector('[data-active="true"]');
-    if (active) {
-      const box = boxRef.current;
+
+    const box = boxRef.current;
+    const active = box.querySelector<HTMLElement>('[data-active="true"]');
+    if (!active) return;
+
+    // Use requestAnimationFrame for smooth, jank-free scrolling
+    let rafId: number;
+    const scrollToCenter = () => {
+      if (!box || !active) return;
+
       const boxRect = box.getBoundingClientRect();
       const elRect = active.getBoundingClientRect();
-      if (elRect.top < boxRect.top + 40 || elRect.bottom > boxRect.bottom - 40) {
-        active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // Calculate center of active line relative to the container
+      const elCenter = elRect.top + elRect.height / 2;
+      const boxCenter = boxRect.top + boxRect.height / 2;
+      const offset = elCenter - boxCenter;
+
+      // Only scroll if element is not already centered (within 5px tolerance)
+      if (Math.abs(offset) > 5) {
+        const currentScroll = box.scrollTop;
+        const targetScroll = currentScroll + offset;
+
+        // Smooth scroll using scrollTo
+        box.scrollTo({
+          top: Math.max(0, targetScroll),
+          behavior: 'smooth',
+        });
       }
-    }
+    };
+
+    // Small delay to let CSS transitions settle, then scroll
+    rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(scrollToCenter);
+    });
+
+    return () => cancelAnimationFrame(rafId);
   }, [currentTime, isPlaying]);
 
   if (!filteredWords.length) {
     return (
       <div
-        className="w-full rounded-2xl p-7 mb-5 min-h-[240px] max-h-[360px] flex items-center justify-center"
+        className="w-full rounded-2xl p-7 mb-5 flex-1 min-h-[240px] flex items-center justify-center"
         style={{ background: 'var(--color-bg-card)' }}
       >
         <div className="text-[18px] font-medium" style={{ color: 'var(--color-text-muted)' }}>
@@ -82,7 +110,7 @@ export default function LyricsDisplay({ words, currentTime, clipStart, clipEnd, 
   return (
     <div
       ref={boxRef}
-      className="w-full rounded-2xl p-7 pb-6 mb-5 min-h-[240px] max-h-[360px] overflow-y-auto scroll-smooth"
+      className="w-full rounded-2xl p-7 pb-6 mb-5 min-h-full overflow-y-auto scroll-smooth"
       style={{ background: 'var(--color-bg-card)' }}
     >
       {lines.map((line, li) => {
