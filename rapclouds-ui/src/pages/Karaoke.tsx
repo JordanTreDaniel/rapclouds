@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useAudioPlayback } from '../hooks/useAudioPlayback';
 import { useRecording } from '../hooks/useRecording';
 import SongPicker from '../components/karaoke/SongPicker';
-import SectionPicker from '../components/karaoke/SectionPicker';
+import RangeSlider from '../components/karaoke/RangeSlider';
 import LyricsDisplay from '../components/karaoke/LyricsDisplay';
 import RecordingControls from '../components/karaoke/RecordingControls';
 import Countdown from '../components/karaoke/Countdown';
@@ -11,7 +11,6 @@ import GradeCard from '../components/karaoke/GradeCard';
 import type {
   SongMeta,
   GroundTruth,
-  Section,
   GradeResult,
   ViewMode,
 } from '../components/karaoke/types';
@@ -20,8 +19,8 @@ export default function Karaoke() {
   const [view, setView] = useState<ViewMode>('setup');
   const [song, setSong] = useState<SongMeta | null>(null);
   const [groundTruth, setGroundTruth] = useState<GroundTruth | null>(null);
-  const [sections, setSections] = useState<Section[]>([]);
-  const [selectedSection, setSelectedSection] = useState<Section | null>(null);
+  const [clipStart, setClipStart] = useState<number | null>(null);
+  const [clipEnd, setClipEnd] = useState<number | null>(null);
   const [countdownActive, setCountdownActive] = useState(false);
   const [gradingActive, setGradingActive] = useState(false);
   const [gradeResult, setGradeResult] = useState<GradeResult | null>(null);
@@ -46,30 +45,19 @@ export default function Karaoke() {
       setGroundTruth(null);
     }
 
-    // Fetch sections
-    try {
-      const sr = await fetch(`/songs/${encodeURIComponent(name)}/sections.json`);
-      if (sr.ok) {
-        const secs: Section[] = await sr.json();
-        setSections(secs);
-      } else {
-        setSections([]);
-      }
-    } catch {
-      setSections([]);
-    }
-
-    setSelectedSection(null);
+    setClipStart(null);
+    setClipEnd(null);
     setView('performance');
 
     // Set audio source
     audio.loadSrc(`/songs/${encodeURIComponent(name)}/${s.audio}`);
   }, [audio]);
 
-  const handleSectionSelect = useCallback((sec: Section | null) => {
-    setSelectedSection(sec);
+  const handleRangeChange = useCallback((start: number | null, end: number | null) => {
+    setClipStart(start);
+    setClipEnd(end);
     audio.resetTime();
-    audio.seek(sec ? sec.start : 0);
+    audio.seek(start ?? 0);
   }, [audio]);
 
   const finish = useCallback(async () => {
@@ -93,8 +81,8 @@ export default function Karaoke() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               audio: b64,
-              clip_start: selectedSection?.start ?? null,
-              clip_end: selectedSection?.end ?? null,
+              clip_start: clipStart,
+              clip_end: clipEnd,
             }),
           });
           const result: GradeResult = await r.json();
@@ -118,14 +106,14 @@ export default function Karaoke() {
       gradingGuardRef.current = false;
       alert('Grading failed: ' + (e as Error).message);
     }
-  }, [audio, recording, song, selectedSection]);
+  }, [audio, recording, song, clipStart, clipEnd]);
 
   const handleCountdownDone = useCallback(() => {
     // If clip selected, stop at clip end
-    if (selectedSection) {
+    if (clipEnd != null) {
       audio.audioRef.current!.ontimeupdate = () => {
         const el = audio.audioRef.current;
-        if (el && el.currentTime >= selectedSection.end) {
+        if (el && el.currentTime >= clipEnd) {
           finish();
         }
       };
@@ -135,12 +123,12 @@ export default function Karaoke() {
 
     audio.play();
     audio.audioRef.current!.onended = () => finish();
-  }, [selectedSection, audio, finish]);
+  }, [clipEnd, audio, finish]);
 
   const handleStart = useCallback(async () => {
     if (!groundTruth) return;
 
-    audio.seek(selectedSection ? selectedSection.start : 0);
+    audio.seek(clipStart ?? 0);
 
     try {
       await recording.startRecording();
@@ -151,7 +139,7 @@ export default function Karaoke() {
     } catch {
       alert('Mic access required. Please allow and retry.');
     }
-  }, [groundTruth, selectedSection, audio, recording]);
+  }, [groundTruth, clipStart, audio, recording]);
 
   const handleStop = useCallback(() => {
     gradingGuardRef.current = false;
@@ -164,13 +152,14 @@ export default function Karaoke() {
     setView('setup');
     setSong(null);
     setGroundTruth(null);
-    setSections([]);
-    setSelectedSection(null);
+    setClipStart(null);
+    setClipEnd(null);
     setGradeResult(null);
   }, [handleStop]);
 
   const handleRetry = useCallback(() => {
-    setSelectedSection(null);
+    setClipStart(null);
+    setClipEnd(null);
     audio.resetTime();
     if (song) {
       handleSongSelect(song);
@@ -224,13 +213,12 @@ export default function Karaoke() {
         {/* ── PERFORMANCE VIEW ── */}
         {view === 'performance' && (
           <div className="flex flex-col w-full flex-1 min-h-0">
-            {sections.length > 0 && (
-              <SectionPicker
-                sections={sections}
-                selected={selectedSection}
-                onSelect={handleSectionSelect}
-              />
-            )}
+            <RangeSlider
+              duration={audio.duration}
+              clipStart={clipStart}
+              clipEnd={clipEnd}
+              onChange={handleRangeChange}
+            />
 
             {/* Progress bar */}
             <div
@@ -253,8 +241,8 @@ export default function Karaoke() {
               <LyricsDisplay
                 words={filteredWords}
                 currentTime={audio.currentTime}
-                clipStart={selectedSection?.start ?? null}
-                clipEnd={selectedSection?.end ?? null}
+                clipStart={clipStart}
+                clipEnd={clipEnd}
                 isPlaying={recording.isRecording}
               />
             </div>
