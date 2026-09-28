@@ -11,9 +11,10 @@ import type { Word } from '../../types';
 interface Props {
   words: Word[];
   onTimingSave: (words: Word[]) => void;
+  audioUrl: string | null;
 }
 
-export default function TimelineEditor({ words, onTimingSave }: Props) {
+export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props) {
   const [localWords, setLocalWords] = useState<Word[]>(words);
   const [selectedWord, setSelectedWord] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -28,8 +29,13 @@ export default function TimelineEditor({ words, onTimingSave }: Props) {
 
   const {
     audioRef, currentTime, duration, isPlaying,
-    play, pause, seek,
+    play, pause, seek, loadSrc,
   } = useAudioPlayback();
+
+  // Load audio source when URL changes
+  useEffect(() => {
+    if (audioUrl) loadSrc(audioUrl);
+  }, [audioUrl, loadSrc]);
 
   // Auto-save with debounce
   const saveTiming = useCallback((updatedWords: Word[]) => {

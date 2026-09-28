@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import SongList from '../components/admin/SongList';
 import LyricsEditor from '../components/admin/LyricsEditor';
 import TimelineEditor from '../components/admin/TimelineEditor';
-import { fetchSong, updateSongText, updateSongTiming } from '../api';
-import type { GroundTruth } from '../types';
+import { fetchSong, fetchSongs, updateSongText, updateSongTiming } from '../api';
+import type { GroundTruth, SongMeta } from '../types';
 
 type Tab = 'lyrics' | 'timing';
 
@@ -12,8 +12,13 @@ export default function Admin() {
   const [songData, setSongData] = useState<GroundTruth | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<Tab>('lyrics');
+  const [activeTab, setActiveTab] = useState<Tab>('timing');
   const [saving, setSaving] = useState(false);
+  const [songs, setSongs] = useState<SongMeta[]>([]);
+
+  useEffect(() => {
+    fetchSongs().then(setSongs).catch(() => {});
+  }, []);
 
   const loadSong = useCallback(async (name: string) => {
     setSelectedSong(name);
@@ -127,7 +132,12 @@ export default function Admin() {
             activeTab === 'lyrics' ? (
               <LyricsEditor text={songData.text} onSave={handleTextSave} />
             ) : (
-              <TimelineEditor words={songData.words} onTimingSave={handleTimingSave} />
+              <TimelineEditor words={songData.words} onTimingSave={handleTimingSave} audioUrl={
+                (() => {
+                  const meta = songs.find((s) => s.name === selectedSong);
+                  return meta ? `/songs/${encodeURIComponent(selectedSong)}/${meta.audio}` : null;
+                })()
+              } />
             )
           ) : null}
         </div>
