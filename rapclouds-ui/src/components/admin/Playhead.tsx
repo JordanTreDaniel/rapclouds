@@ -1,18 +1,10 @@
-interface PlayheadProps {
-  currentTime: number;
-  pxPerSecond: number;
-}
-
-export default function Playhead({ currentTime, pxPerSecond }: PlayheadProps) {
-  const left = currentTime * pxPerSecond;
-
+export default function Playhead() {
   return (
-    <div
-      className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-20 pointer-events-none"
-      style={{ left: `${left}px` }}
-    >
-      {/* Triangle marker at top */}
-      <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-blue-500 rotate-45" />
+    <div className="relative w-0.5 h-full">
+      {/* Diamond marker at top */}
+      <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-500 rotate-45 z-10" />
+      {/* Vertical line */}
+      <div className="w-0.5 h-full bg-blue-500" />
     </div>
   );
 }

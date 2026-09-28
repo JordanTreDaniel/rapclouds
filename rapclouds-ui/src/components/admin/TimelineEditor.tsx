@@ -176,9 +176,10 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
       </div>
 
       {/* Timeline area */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden relative" id="timeline-area">
         <div
           ref={scrollRef}
+          id="timeline-scroll-ref"
           className="h-full overflow-x-auto overflow-y-hidden"
         >
           {/* Time axis */}
@@ -221,9 +222,6 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
               );
             })}
 
-            {/* Playhead */}
-            <Playhead currentTime={currentTime} pxPerSecond={pxPerSecond} />
-
             {/* Word blocks */}
             {localWords.map((word, index) => (
               <WordBlock
@@ -238,6 +236,11 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
               />
             ))}
           </div>
+        </div>
+
+        {/* Fixed playhead — centered in viewport, content scrolls underneath */}
+        <div className="absolute top-0 bottom-0 z-30 pointer-events-none" style={{ left: '50%' }}>
+          <Playhead />
         </div>
       </div>
     </div>

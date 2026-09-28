@@ -14,6 +14,8 @@ function App() {
           display: grid;
           grid-template-rows: 64px 1fr;
           min-height: 100vh;
+          width: 100%;
+          overflow: hidden;
         }
         @media (max-width: 640px) {
           .app-shell > header { padding: 0 12px !important; }

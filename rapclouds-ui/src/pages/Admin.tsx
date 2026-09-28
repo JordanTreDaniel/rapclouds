@@ -64,7 +64,7 @@ export default function Admin() {
   // Song selected, show editor
   if (selectedSong) {
     return (
-      <div className="flex flex-col h-[calc(100vh-64px)]">
+      <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
         {/* Top bar */}
         <div className="shrink-0 flex items-center gap-3 px-4 py-3 border-b border-border bg-bg-card">
           <button
