@@ -10,6 +10,15 @@ import subprocess
 import tempfile
 from typing import Optional, List, Dict, Any
 
+# Load .env file if present (for local dev with OPENAI_API_KEY etc.)
+try:
+    from dotenv import load_dotenv
+    _env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    if os.path.exists(_env_path):
+        load_dotenv(_env_path)
+except ImportError:
+    pass  # python-dotenv not installed; rely on environment
+
 _server_dir = os.path.dirname(os.path.abspath(__file__))
 _default_standalone = os.path.normpath(os.path.join(_server_dir, '..', '..', 'standalone'))
 _standalone_path = os.environ.get('RAPCLOUDS_STANDALONE_DIR', _default_standalone)
