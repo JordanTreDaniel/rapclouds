@@ -3,6 +3,10 @@ __pycache__/
 output*/
 *.pyc
 
+# User-generated data (recordings, grades)
+data/songs/*/recordings/
+data/songs/*/grades/
+
 # Legacy codebases (tracked in separate repos)
 rapCloudsReact/
 rapCloudsServer/
