@@ -61,37 +61,6 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
     });
   }, [saveTiming]);
 
-  // Delete selected word
-  const deleteWord = useCallback(() => {
-    if (selectedWord === null) return;
-    setLocalWords((prev) => {
-      const updated = prev.filter((_, i) => i !== selectedWord);
-      saveTiming(updated);
-      return updated;
-    });
-    setSelectedWord(null);
-  }, [selectedWord, saveTiming]);
-
-  // Insert a new word at the playhead position
-  const insertWordAtPlayhead = useCallback(() => {
-    const newWord: Word = {
-      word: 'new',
-      start: currentTime,
-      end: Math.min(currentTime + 0.5, duration),
-    };
-    setLocalWords((prev) => {
-      const insertIndex = prev.findIndex((w) => w.start > newWord.start);
-      const updated = [...prev];
-      if (insertIndex === -1) {
-        updated.push(newWord);
-      } else {
-        updated.splice(insertIndex, 0, newWord);
-      }
-      saveTiming(updated);
-      return updated;
-    });
-  }, [currentTime, duration, saveTiming]);
-
   const onWordResize = useCallback((index: number, edge: 'left' | 'right', newTime: number) => {
     setLocalWords((prev) => {
       const updated = [...prev];
@@ -134,14 +103,10 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
         if (isPlaying) pause();
         else play();
       }
-      if ((e.code === 'Delete' || e.code === 'Backspace') && selectedWord !== null && e.target === document.body) {
-        e.preventDefault();
-        deleteWord();
-      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, play, pause, selectedWord, deleteWord]);
+  }, [isPlaying, play, pause]);
 
   // Auto-scroll to keep playhead centered in viewport
   useEffect(() => {
@@ -235,19 +200,6 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
           )}
           <span className="text-xs text-text-muted">{localWords.length} words</span>
           <button
-            onClick={deleteWord}
-            disabled={selectedWord === null}
-            className="text-xs px-2 py-1 rounded bg-red/20 text-red hover:bg-red/30 disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            🗑 Delete
-          </button>
-          <button
-            onClick={insertWordAtPlayhead}
-            className="text-xs px-2 py-1 rounded bg-green/20 text-green hover:bg-green/30"
-          >
-            + Insert at Playhead
-          </button>
-          <button
             onClick={() => setShowPlayhead(!showPlayhead)}
             className={`text-xs px-2 py-1 rounded ${showPlayhead ? 'bg-pink text-white' : 'bg-bg-secondary text-text-muted'}`}
             title={showPlayhead ? 'Hide playhead' : 'Show playhead'}
@@ -290,7 +242,7 @@ export default function TimelineEditor({ words, onTimingSave, audioUrl }: Props)
           {/* Words container */}
           <div
             ref={wordsContainerRef}
-            className="relative h-full min-h-[120px] cursor-crosshair"
+            className="relative h-full cursor-crosshair"
             style={{ width: `${totalTimelineWidth + 100}px`, minWidth: '100%' }}
             onClick={handleTimelineClick}
           >

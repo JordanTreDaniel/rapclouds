@@ -33,13 +33,13 @@ export default function WordBlock({
     <div
       data-testid="word-block"
       className={`
-        group absolute top-1/2 -translate-y-1/2 h-20 min-w-[60px] rounded-lg border cursor-grab select-none
-        flex items-center justify-center transition-all duration-75
+        group absolute top-1/2 -translate-y-1/2 h-16 rounded-lg border cursor-grab select-none
+        flex items-center justify-center transition-colors duration-150
         ${isActive
           ? 'bg-pink/20 border-pink shadow-[0_0_12px_rgba(255,20,147,0.4)] z-10'
           : isNear
             ? 'bg-pink/10 border-pink/30'
-            : 'bg-white/5 border-border hover:border-border-light hover:bg-white/10'
+            : 'bg-bg-card border-border hover:border-border-light hover:bg-bg-card-alt'
         }
       `}
       style={{ left: `${left}px`, width: `${width}px` }}
@@ -51,26 +51,23 @@ export default function WordBlock({
     >
       {/* Left resize handle */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-3 cursor-col-resize opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute left-0 top-0 bottom-0 w-2 cursor-col-resize opacity-0 group-hover:opacity-100 transition-opacity"
         onMouseDown={(e) => handleMouseDown(e, 'left')}
       >
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-pink rounded-full" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-pink rounded-full" />
       </div>
 
       {/* Word text */}
-      <span
-        className={`text-lg font-bold tracking-wide px-2 pointer-events-none ${isActive ? 'text-pink' : 'text-white/90'}`}
-        style={{ fontFamily: '"Bebas Neue", Impact, sans-serif', letterSpacing: '0.08em' }}
-      >
+      <span className={`text-sm font-medium truncate px-2 pointer-events-none ${isActive ? 'text-pink' : 'text-text'}`}>
         {word.word}
       </span>
 
       {/* Right resize handle */}
       <div
-        className="absolute right-0 top-0 bottom-0 w-3 cursor-col-resize opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize opacity-0 group-hover:opacity-100 transition-opacity"
         onMouseDown={(e) => handleMouseDown(e, 'right')}
       >
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-pink rounded-full" />
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-pink rounded-full" />
       </div>
     </div>
   );

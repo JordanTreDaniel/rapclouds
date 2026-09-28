@@ -14,11 +14,6 @@ export interface WordDragHandlers {
   dragIndex: number | null;
 }
 
-/** Round to 2 decimal places (0.01s precision) */
-function roundTo100ths(v: number): number {
-  return Math.round(v * 100) / 100;
-}
-
 export function useWordDrag(
   callbacks: WordDragCallbacks,
   pxToTime: (px: number) => number,
@@ -59,20 +54,17 @@ export function useWordDrag(
     const deltaTime = pxToTime(dx);
 
     if (state.type === 'move') {
-      // MOVE: keep snap for alignment
       const newStart = snapToTick(Math.max(0, state.originalStart + deltaTime));
       const duration = state.originalEnd - state.originalStart;
       const newEnd = newStart + duration;
       callbacks.onWordMove(state.index, newStart, newEnd);
     } else if (state.type === 'left') {
-      // LEFT EDGE: no snap, 1/100s precision
-      const newStart = roundTo100ths(Math.max(0, state.originalStart + deltaTime));
+      const newStart = snapToTick(Math.max(0, state.originalStart + deltaTime));
       if (newStart < state.originalEnd - 0.01) {
         callbacks.onWordResize(state.index, 'left', newStart);
       }
     } else if (state.type === 'right') {
-      // RIGHT EDGE: no snap, 1/100s precision
-      const newEnd = roundTo100ths(Math.max(state.originalStart + 0.01, state.originalEnd + deltaTime));
+      const newEnd = snapToTick(Math.max(state.originalStart + 0.01, state.originalEnd + deltaTime));
       callbacks.onWordResize(state.index, 'right', newEnd);
     }
   }, [callbacks, pxToTime, snapToTick]);
