@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radar Chart Library Comparison — 4 Automation Levels × 8 Criteria</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; padding: 24px; }
+    h1 { text-align: center; font-size: 1.6rem; margin-bottom: 8px; color: #fff; }
+    .subtitle { text-align: center; color: #888; margin-bottom: 32px; font-size: 0.9rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1200px; margin: 0 auto; }
+    .card { background: #1a1d27; border-radius: 12px; padding: 20px; border: 1px solid #2a2d3a; }
+    .card h2 { font-size: 1.1rem; margin-bottom: 4px; color: #60a5fa; }
+    .card .version { font-size: 0.75rem; color: #666; margin-bottom: 12px; }
+    .chart-container { width: 100%; height: 420px; position: relative; }
+    .card canvas { max-width: 100%; max-height: 100%; }
+    #d3-radar { width: 100%; height: 100%; }
+    #d3-radar svg { width: 100%; height: 100%; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-left: 8px; }
+    .badge-rec { background: #166534; color: #4ade80; }
+    .badge-ok { background: #1e3a5f; color: #60a5fa; }
+    .badge-adv { background: #4a1942; color: #c084fc; }
+    .pros-cons { margin-top: 16px; font-size: 0.8rem; line-height: 1.5; }
+    .pros-cons h3 { font-size: 0.85rem; margin-bottom: 4px; }
+    .pro { color: #4ade80; }
+    .con { color: #f87171; }
+    .note { color: #888; font-style: italic; margin-top: 8px; }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<h1>🤖 Automation Level Comparison — Radar Charts</h1>
+<p class="subtitle">4 automation levels × 8 criteria · Tradeoff visualization for non-technical audiences</p>
+
+<div class="grid">
+
+  <!-- Chart.js -->
+  <div class="card">
+    <h2>Chart.js <span class="badge badge-rec">★ RECOMMENDED</span></h2>
+    <p class="version">v4.5.1 · 200KB CDN · MIT License</p>
+    <div class="chart-container">
+      <canvas id="chartjs-radar"></canvas>
+    </div>
+    <div class="pros-cons">
+      <h3 class="pro">✅ Pros</h3>
+      <ul>
+        <li>30 lines of JS — simplest API for radar charts</li>
+        <li>Interactive tooltips out of the box (hover → see exact values)</li>
+        <li>Responsive — resizes cleanly on mobile</li>
+        <li>Legend toggles datasets on/off (click to compare subsets)</li>
+        <li>Canvas-based = crisp on retina screens</li>
+      </ul>
+      <h3 class="con">⚠️ Cons</h3>
+      <ul>
+        <li>Less animation polish than ApexCharts</li>
+        <li>Fill transparency can muddy with 4 overlapping datasets</li>
+        <li>Custom axis labels require plugin workarounds</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ApexCharts -->
+  <div class="card">
+    <h2>ApexCharts <span class="badge badge-ok">GOOD ALTERNATIVE</span></h2>
+    <p class="version">v4.4.0 · 150KB CDN · MIT License</p>
+    <div class="chart-container">
+      <div id="apexcharts-radar"></div>
+    </div>
+    <div class="pros-cons">
+      <h3 class="pro">✅ Pros</h3>
+      <ul>
+        <li>Prettiest out-of-the-box animations</li>
+        <li>Built-in data labels on each point (no plugin needed)</li>
+        <li>Dark theme is excellent — looks professional immediately</li>
+        <li>Built-in export to PNG/SVG</li>
+        <li>Legend with click-to-hide is very polished</li>
+      </ul>
+      <h3 class="con">⚠️ Cons</h3>
+      <ul>
+        <li>Slightly more config boilerplate than Chart.js</li>
+        <li>4 filled datasets can look cluttered (mitigate with opacity)</li>
+        <li>Larger total bundle if already using Chart.js elsewhere</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- D3.js -->
+  <div class="card">
+    <h2>D3.js <span class="badge badge-adv">ADVANCED</span></h2>
+    <p class="version">v7 · 100KB CDN · ISC License</p>
+    <div class="chart-container">
+      <div id="d3-radar"></div>
+    </div>
+    <div class="pros-cons">
+      <h3 class="pro">✅ Pros</h3>
+      <ul>
+        <li>Full control over every pixel — unlimited customization</li>
+        <li>Smallest core library (others wrap D3 internally)</li>
+        <li>Can add custom annotations, animations, interactions</li>
+        <li>Best for unique, branded visualizations</li>
+      </ul>
+      <h3 class="con">⚠️ Cons</h3>
+      <ul>
+        <li>100+ lines of boilerplate for a basic radar chart</li>
+        <li>No built-in radar chart — you build the SVG from scratch</li>
+        <li>No tooltips, legends, or interactivity without manual code</li>
+        <li>Steepest learning curve by far</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Verdict -->
+  <div class="card">
+    <h2>📋 Verdict for Non-Technical Audiences</h2>
+    <div style="padding: 16px 0; font-size: 0.9rem; line-height: 1.7;">
+      <p style="margin-bottom: 12px;">
+        <strong style="color: #4ade80;">Winner: Chart.js</strong> for this use case.<br>
+        It hits the sweet spot: dead-simple code, interactive tooltips that let non-technical
+        users hover to see exact scores, and clickable legends to isolate individual automation
+        levels. The 4 overlapping fills with 20% opacity create a clear visual hierarchy
+        where tradeoffs are immediately visible as area shapes.
+      </p>
+      <p style="margin-bottom: 12px;">
+        <strong style="color: #60a5fa;">Runner-up: ApexCharts</strong> if you want the chart to look
+        like it came from a design agency. Better default aesthetics, but slightly more config.
+      </p>
+      <p style="margin-bottom: 12px;">
+        <strong style="color: #c084fc;">Skip D3.js</strong> unless you need a one-off custom
+        visualization with unique interactions. The ROI isn't there for a comparison chart.
+      </p>
+      <p class="note">
+        Key insight for tradeoff visibility: use <code>fill: true</code> with low opacity
+        (0.1–0.2) so overlapping areas blend visually. The <em>shape</em> of each area tells
+        the story — a lopsided shape = tradeoff, a balanced shape = well-rounded. Users don't
+        need to read numbers.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- ApexCharts CDN -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
+<!-- D3.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SHARED DATA: 4 Automation Levels × 8 Criteria (scored 1-10)
+// ═══════════════════════════════════════════════════════════════
+const criteria = [
+  'Setup Speed', 'Cost', 'Reliability', 'Customization',
+  'Learning Curve', 'Scalability', 'Integration', 'Maintenance'
+];
+
+const datasets = [
+  { name: 'Manual (No Automation)', scores: [9, 10, 6, 9, 9, 2, 3, 8] },
+  { name: 'Basic Scripts',          scores: [6, 8, 7, 5, 6, 5, 5, 5] },
+  { name: 'AI-Assisted',           scores: [4, 5, 8, 7, 4, 8, 8, 4] },
+  { name: 'Full Automation',        scores: [2, 3, 9, 4, 2, 10, 9, 3] },
+];
+
+const colors = [
+  { bg: 'rgba(74, 222, 128, 0.15)', border: '#4ade80' },  // green
+  { bg: 'rgba(96, 165, 250, 0.15)', border: '#60a5fa' },  // blue
+  { bg: 'rgba(192, 132, 252, 0.15)', border: '#c084fc' }, // purple
+  { bg: 'rgba(251, 146, 60, 0.15)', border: '#fb923c' },  // orange
+];
+
+// ═══════════════════════════════════════════════════════════════
+// 1. CHART.JS — Simple, recommended
+// ═══════════════════════════════════════════════════════════════
+new Chart(document.getElementById('chartjs-radar'), {
+  type: 'radar',
+  data: {
+    labels: criteria,
+    datasets: datasets.map((ds, i) => ({
+      label: ds.name,
+      data: ds.scores,
+      fill: true,
+      backgroundColor: colors[i].bg,
+      borderColor: colors[i].border,
+      borderWidth: 2,
+      pointBackgroundColor: colors[i].border,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+    }))
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#ccc', font: { size: 11 }, boxWidth: 14, padding: 12 }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0,0,0,0.85)',
+        titleFont: { size: 13 },
+        bodyFont: { size: 12 },
+        padding: 10,
+      }
+    },
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 10,
+        ticks: { stepSize: 2, color: '#888', backdropColor: 'transparent', font: { size: 10 } },
+        grid: { color: 'rgba(255,255,255,0.08)' },
+        angleLines: { color: 'rgba(255,255,255,0.08)' },
+        pointLabels: { color: '#ccc', font: { size: 11, weight: '500' } }
+      }
+    },
+    animation: { duration: 1200, easing: 'easeOutQuart' }
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 2. APEXCHARTS — Polished, pretty
+// ═══════════════════════════════════════════════════════════════
+new ApexCharts(document.querySelector('#apexcharts-radar'), {
+  series: datasets.map(ds => ({ name: ds.name, data: ds.scores })),
+  chart: {
+    type: 'radar',
+    height: 420,
+    toolbar: { show: false },
+    background: 'transparent',
+  },
+  stroke: { width: 2 },
+  fill: { opacity: 0.12 },
+  markers: { size: 3, strokeWidth: 1, strokeColors: '#fff' },
+  colors: ['#4ade80', '#60a5fa', '#c084fc', '#fb923c'],
+  xaxis: { categories: criteria },
+  yaxis: { show: false, max: 10 },
+  legend: {
+    position: 'bottom',
+    fontSize: '11px',
+    labels: { colors: '#ccc' },
+    markers: { width: 10, height: 10, radius: 2 }
+  },
+  tooltip: { theme: 'dark' },
+  plotOptions: {
+    radar: {
+      polygons: {
+        strokeColors: 'rgba(255,255,255,0.08)',
+        strokeWidth: 0.5,
+        connectorColors: 'rgba(255,255,255,0.08)',
+        fill: { colors: ['transparent'] }
+      }
+    }
+  },
+  dataLabels: { enabled: false },
+  animations: { enabled: true, speed: 1000, easing: 'easeinout' }
+}).render();
+
+// ═══════════════════════════════════════════════════════════════
+// 3. D3.JS — Manual, from scratch
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  const container = document.getElementById('d3-radar');
+  const size = Math.min(container.clientWidth, container.clientHeight) || 380;
+  const margin = 60;
+  const radius = (size / 2) - margin;
+  const levels = 5;
+  const totalAxes = criteria.length;
+  const angleSlice = (Math.PI * 2) / totalAxes;
+  const maxValue = 10;
+
+  const svg = d3.select(container)
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', '100%')
+    .attr('viewBox', `0 0 ${size} ${size}`)
+    .append('g')
+    .attr('transform', `translate(${size/2},${size/2})`);
+
+  const rScale = d3.scaleLinear().domain([0, maxValue]).range([0, radius]);
+
+  // Grid circles
+  for (let l = 1; l <= levels; l++) {
+    svg.append('circle')
+      .attr('r', (radius / levels) * l)
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(255,255,255,0.08)')
+      .attr('stroke-width', 0.5);
+  }
+
+  // Axis lines + labels
+  criteria.forEach((label, i) => {
+    const angle = angleSlice * i - Math.PI / 2;
+    const x = rScale(maxValue) * Math.cos(angle);
+    const y = rScale(maxValue) * Math.sin(angle);
+
+    svg.append('line')
+      .attr('x1', 0).attr('y1', 0)
+      .attr('x2', x).attr('y2', y)
+      .attr('stroke', 'rgba(255,255,255,0.08)')
+      .attr('stroke-width', 0.5);
+
+    svg.append('text')
+      .attr('x', (rScale(maxValue) + 12) * Math.cos(angle))
+      .attr('y', (rScale(maxValue) + 12) * Math.sin(angle))
+      .text(label)
+      .attr('fill', '#ccc')
+      .attr('font-size', '10px')
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle');
+  });
+
+  // Draw data areas
+  const lineGen = d3.lineRadial()
+    .angle((d, i) => angleSlice * i)
+    .radius(d => rScale(d))
+    .curve(d3.curveLinearClosed);
+
+  const hexColors = ['#4ade80', '#60a5fa', '#c084fc', '#fb923c'];
+
+  datasets.forEach((ds, idx) => {
+    svg.append('path')
+      .datum(ds.scores)
+      .attr('d', lineGen)
+      .attr('fill', hexColors[idx])
+      .attr('fill-opacity', 0.12)
+      .attr('stroke', hexColors[idx])
+      .attr('stroke-width', 1.5)
+      .attr('stroke-opacity', 0.8);
+
+    // Data points
+    ds.scores.forEach((val, i) => {
+      const angle = angleSlice * i - Math.PI / 2;
+      svg.append('circle')
+        .attr('cx', rScale(val) * Math.cos(angle))
+        .attr('cy', rScale(val) * Math.sin(angle))
+        .attr('r', 3)
+        .attr('fill', hexColors[idx])
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 0.5);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
