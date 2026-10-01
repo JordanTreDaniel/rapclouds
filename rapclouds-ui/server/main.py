@@ -8,6 +8,7 @@ import base64
 import re
 import subprocess
 import tempfile
+import unicodedata
 from typing import Optional, List, Dict, Any
 
 # Load .env file if present (for local dev with OPENAI_API_KEY etc.)
@@ -89,6 +90,29 @@ SONGS_DIR = os.environ.get(
 )
 OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
 WHISPER_API = "https://api.openai.com/v1/audio/transcriptions"
+
+# Whisper verbose_json returns full language names; the API parameter needs ISO 639-1 codes
+WHISPER_LANG_CODES = {
+    "english": "en", "spanish": "es", "french": "fr", "german": "de",
+    "italian": "it", "portuguese": "pt", "dutch": "nl", "russian": "ru",
+    "japanese": "ja", "korean": "ko", "chinese": "zh", "arabic": "ar",
+    "hindi": "hi", "turkish": "tr", "polish": "pl", "swedish": "sv",
+    "norwegian": "no", "danish": "da", "finnish": "fi", "greek": "el",
+    "czech": "cs", "romanian": "ro", "hungarian": "hu", "thai": "th",
+    "vietnamese": "vi", "indonesian": "id", "malay": "ms", "ukrainian": "uk",
+    "catalan": "ca", "filipino": "tl", "hebrew": "he", "persian": "fa",
+    "urdu": "ur", "bengali": "bn", "tamil": "ta", "telugu": "te",
+    "marathi": "mr", "gujarati": "gu", "kannada": "kn", "malayalam": "ml",
+    "punjabi": "pa", "swahili": "sw", "serbian": "sr", "croatian": "hr",
+    "slovak": "sk", "slovenian": "sl", "lithuanian": "lt", "latvian": "lv",
+    "estonian": "et", "basque": "eu", "galician": "gl", "icelandic": "is",
+    "irish": "ga", "scottish gaelic": "gd", "welsh": "cy", "luxembourgish": "lb",
+    "maltese": "mt", "afrikaans": "af", "albanian": "sq", "armenian": "hy",
+    "bosnian": "bs", "burmese": "my", "khmer": "km", "lao": "lo",
+    "mongolian": "mn", "nepali": "ne", "sinhala": "si", "somali": "so",
+    "sundanese": "su", "tagalog": "tl", "tatar": "tt",
+    "uzbek": "uz", "zulu": "zu",
+}
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -181,7 +205,7 @@ class GradeResult(BaseModel):
 #  Karaoke Helper Functions (ported from karaoke-mvp/server.py)
 # ═══════════════════════════════════════════════════════════════════════
 
-def openai_transcribe(audio_path: str, prompt: str = "") -> dict:
+def openai_transcribe(audio_path: str, prompt: str = "", language: str = None) -> dict:
     """Transcribe audio using OpenAI Whisper API."""
     import requests as _requests
 
@@ -195,8 +219,9 @@ def openai_transcribe(audio_path: str, prompt: str = "") -> dict:
             "model": "whisper-1",
             "response_format": "verbose_json",
             "timestamp_granularities[]": "word",
-            "language": "en",
         }
+        if language:
+            data["language"] = WHISPER_LANG_CODES.get(language.lower(), language)
         if prompt:
             data["prompt"] = prompt
         resp = _requests.post(WHISPER_API, headers=headers, files=files, data=data, timeout=30)
@@ -208,8 +233,11 @@ def openai_transcribe(audio_path: str, prompt: str = "") -> dict:
 
 
 def normalize(w: str) -> str:
-    """Normalize a word for comparison (lowercase, strip punctuation)."""
-    return re.sub(r'[^\w]', '', w.lower().strip())
+    """Normalize a word for comparison (lowercase, strip accents, strip punctuation)."""
+    # Strip accents: decompose unicode then remove combining marks
+    nfkd = unicodedata.normalize('NFKD', w.lower().strip())
+    ascii_approx = ''.join(c for c in nfkd if not unicodedata.combining(c))
+    return re.sub(r'[^\w]', '', ascii_approx)
 
 
 def detect_sections_llm(words: list, full_text: str) -> list:
@@ -345,7 +373,7 @@ def prepare_song(youtube_url: str, song_name: str, lyrics_text: str = None) -> d
 
     # 3. Transcribe via OpenAI Whisper API
     print(f"Transcribing {os.path.basename(audio_path)} via OpenAI Whisper API...")
-    result = openai_transcribe(wav_path)
+    result = openai_transcribe(wav_path, language=None)
 
     # 4. Extract word-level timestamps
     words = []
@@ -388,6 +416,7 @@ def prepare_song(youtube_url: str, song_name: str, lyrics_text: str = None) -> d
         "segments": len(segments),
         "duration": duration,
         "youtube_url": youtube_url,
+        "language": WHISPER_LANG_CODES.get(result.get("language", "en").lower(), result.get("language", "en")),
     }
     meta_path = os.path.join(song_dir, "metadata.json")
     with open(meta_path, "w") as f:
@@ -417,6 +446,14 @@ def grade_recording(recording_path: str, song_name: str,
         gt = json.load(f)
     gt_words = gt["words"]
 
+    # Read song language from metadata (for Whisper transcription of user recording)
+    song_language = None
+    meta_path = os.path.join(song_dir, "metadata.json")
+    if os.path.exists(meta_path):
+        with open(meta_path) as f:
+            song_meta = json.load(f)
+        song_language = song_meta.get("language")
+
     # If clip specified, filter ground truth
     if clip_start is not None and clip_end is not None:
         gt_words = [w for w in gt_words if w["start"] >= clip_start and w["end"] <= clip_end]
@@ -426,7 +463,7 @@ def grade_recording(recording_path: str, song_name: str,
     # Transcribe user recording
     prompt = "rap lyrics, music performance"
     print("Grading recording via OpenAI Whisper API...")
-    result = openai_transcribe(recording_path, prompt)
+    result = openai_transcribe(recording_path, prompt, language=song_language)
 
     user_words = []
     for w in result.get("words", []):
