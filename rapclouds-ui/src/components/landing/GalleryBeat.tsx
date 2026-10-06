@@ -6,14 +6,16 @@ const squareImages = new Set([
   'v7_cartoon_lyourz_dark',
 ]);
 
+const assetVersion = '2';
+
 export default function GalleryBeat({ beat }: { beat: Beat }): JSX.Element {
   const imageLeft = beat.side === 'left';
   const square = squareImages.has(beat.image);
-  const src = `/gallery/webp/${beat.image}_900.webp`;
+  const src = `/gallery/webp/${beat.image}_900.webp?v=${assetVersion}`;
   const srcSet = [
-    `/gallery/webp/${beat.image}_400.webp 400w`,
-    `/gallery/webp/${beat.image}_900.webp 900w`,
-    `/gallery/${beat.image}.png 1200w`,
+    `/gallery/webp/${beat.image}_400.webp?v=${assetVersion} 400w`,
+    `/gallery/webp/${beat.image}_900.webp?v=${assetVersion} 900w`,
+    `/gallery/${beat.image}.png?v=${assetVersion} 1200w`,
   ].join(', ');
 
   const bleedStyle: CSSProperties = imageLeft
@@ -30,10 +32,10 @@ export default function GalleryBeat({ beat }: { beat: Beat }): JSX.Element {
       <div className={imageLeft ? 'md:order-1' : 'md:order-2'} style={bleedStyle}>
         <div data-speed={beat.speed} className="will-change-transform">
           <img
-            className="rc-float h-auto w-full"
+            className="rc-float h-auto w-full max-w-[900px]"
             src={src}
             srcSet={srcSet}
-            sizes="(max-width: 768px) 90vw, 45vw"
+            sizes="(max-width: 768px) 92vw, 52vw"
             alt={`Word cloud art built from J. Cole lyrics — ${beat.headline}`}
             loading="lazy"
             decoding="async"
