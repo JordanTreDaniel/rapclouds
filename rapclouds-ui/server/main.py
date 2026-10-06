@@ -9,6 +9,7 @@ import re
 import subprocess
 import tempfile
 import unicodedata
+from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
 
 # Load .env file if present (for local dev with OPENAI_API_KEY etc.)
@@ -29,7 +30,7 @@ if _standalone_path not in sys.path:
 from fastapi import FastAPI, Query, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, FileResponse, HTMLResponse
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from PIL import Image
 import numpy as np
 from wordcloud import WordCloud
@@ -113,6 +114,13 @@ WHISPER_LANG_CODES = {
     "sundanese": "su", "tagalog": "tl", "tatar": "tt",
     "uzbek": "uz", "zulu": "zu",
 }
+
+SIGNUPS_DIR = os.environ.get('RAPCLOUDS_SIGNUPS_DIR', '/opt/rapclouds/data/signups')
+try:
+    os.makedirs(SIGNUPS_DIR, exist_ok=True)
+except OSError:
+    pass
+_signups_lock = asyncio.Lock()
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -199,6 +207,26 @@ class GradeResult(BaseModel):
     timestamp: Optional[str] = None
     clip_start: Optional[float] = None
     clip_end: Optional[float] = None
+
+
+class SignupRequest(BaseModel):
+    email: str
+    intent: str
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        email = v.strip().lower()
+        if len(email) > 254 or not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+            raise ValueError('invalid email')
+        return email
+
+    @field_validator('intent')
+    @classmethod
+    def validate_intent(cls, v: str) -> str:
+        if v not in ('shirt-art', 'karaoke'):
+            raise ValueError('intent must be shirt-art or karaoke')
+        return v
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -1021,6 +1049,60 @@ async def update_song_timing(name: str, req: UpdateTimingRequest):
     with open(gt_path, "w") as f:
         json.dump(gt, f, indent=2)
     return {"status": "updated"}
+
+
+@app.post("/api/signup")
+async def signup(req: SignupRequest, request: Request):
+    email = req.email
+    intent = req.intent
+    now = datetime.now(timezone.utc)
+    ts = now.strftime('%Y%m%dT%H%M%SZ')
+    slug = re.sub(r'[^a-z0-9]+', '-', email.lower()).strip('-')[:64]
+    filename = f'{ts}_{intent}_{slug}.json'
+    record = {
+        'email': email,
+        'intent': intent,
+        'received_at': now.isoformat(),
+        'source': 'rapclouds_landing',
+        'user_agent': request.headers.get('user-agent'),
+    }
+    jsonl_path = os.path.join(SIGNUPS_DIR, 'signups.jsonl')
+    file_path = os.path.join(SIGNUPS_DIR, filename)
+    async with _signups_lock:
+        try:
+            existing_emails = set()
+            if os.path.isfile(jsonl_path):
+                with open(jsonl_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            entry = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+                        entry_email = entry.get('email')
+                        if isinstance(entry_email, str):
+                            existing_emails.add(entry_email.lower())
+            if email.lower() in existing_emails:
+                return {'ok': True, 'duplicate': True}
+        except Exception:
+            pass
+        try:
+            os.makedirs(SIGNUPS_DIR, exist_ok=True)
+
+            def write_signup():
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(record, f, ensure_ascii=False)
+                with open(jsonl_path, 'a', encoding='utf-8') as f:
+                    f.write(json.dumps({**record, 'file': filename}, ensure_ascii=False) + '\n')
+                    f.flush()
+
+            await asyncio.to_thread(write_signup)
+        except Exception as e:
+            print(f'Signup write failed: {e}')
+            raise HTTPException(status_code=500, detail=f'Signup write failed: {str(e)}')
+    return {'ok': True, 'duplicate': False}
 
 
 # ═══════════════════════════════════════════════════════════════════════
