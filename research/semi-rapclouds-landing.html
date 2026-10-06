@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RapClouds — Custom Word Cloud T-Shirts from Your Favorite Lyrics</title>
+<meta name="description" content="Get a custom word cloud t-shirt made from the lyrics that matter to you. Any artist, any song, any colors. Wear your music.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --bg-elevated: #1a1a1a;
+  --text: #e0e0e0;
+  --text-bright: #ffffff;
+  --muted: #888;
+  --muted-light: #aaa;
+  --pink: #FF1493;
+  --cyan: #00E5FF;
+  --green: #22c55e;
+  --border: #222;
+  --border-light: #333;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px 80px;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,20,147,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(0,229,255,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,20,147,0.1);
+  border: 1px solid rgba(255,20,147,0.25);
+  border-radius: 24px;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  color: var(--pink);
+  font-weight: 500;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  line-height: 1.1;
+  max-width: 800px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+.hero h1 .gradient {
+  background: linear-gradient(135deg, var(--pink), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--muted-light);
+  max-width: 560px;
+  margin: 0 auto 40px;
+  position: relative;
+  z-index: 1;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--pink);
+  color: #fff;
+  text-decoration: none;
+  padding: 16px 36px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  position: relative;
+  z-index: 1;
+  border: none;
+  cursor: pointer;
+}
+.hero-cta:hover {
+  background: #e0107a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255,20,147,0.3);
+}
+.hero-cta svg { width: 20px; height: 20px; }
+.hero-scroll {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: bounce 2s infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ===== SHOWCASE ===== */
+.showcase {
+  padding: 80px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.section-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.section-header p {
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Horizontal scroll gallery */
+.gallery-scroll {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 20px 0 40px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
+.gallery-scroll::-webkit-scrollbar { height: 6px; }
+.gallery-scroll::-webkit-scrollbar-track { background: transparent; }
+.gallery-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+.showcase-card {
+  flex: 0 0 320px;
+  scroll-snap-align: center;
+  background: var(--bg-card);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: transform 0.3s, border-color 0.3s;
+}
+.showcase-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-light);
+}
+.showcase-card.featured {
+  flex: 0 0 400px;
+  border-color: var(--pink);
+}
+.showcase-card .card-img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}
+.showcase-card.featured .card-img {
+  aspect-ratio: 9/16;
+}
+.showcase-card .card-body {
+  padding: 20px;
+}
+.showcase-card .card-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.card-label.v4 { background: rgba(255,255,255,0.08); color: var(--muted-light); }
+.card-label.v5 { background: rgba(255,20,147,0.15); color: var(--pink); }
+.card-label.v7 { background: rgba(0,229,255,0.12); color: var(--cyan); }
+.card-label.v8 { background: rgba(34,197,94,0.15); color: var(--green); }
+.showcase-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+.showcase-card .card-desc {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ===== HOW IT WORKS ===== */
+.how-it-works {
+  padding: 80px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+  margin-top: 48px;
+}
+.step {
+  text-align: center;
+  padding: 32px 24px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.step:nth-child(1) .step-num { background: rgba(255,20,147,0.15); color: var(--pink); }
+.step:nth-child(2) .step-num { background: rgba(0,229,255,0.12); color: var(--cyan); }
+.step:nth-child(3) .step-num { background: rgba(34,197,94,0.15); color: var(--green); }
+.step h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-bright);
+}
+.step p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ===== FEATURE GRID (Why RapClouds) ===== */
+.features {
+  padding: 60px 24px 80px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.feature-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+.feature-item:nth-child(1) .feature-icon { background: rgba(255,20,147,0.12); }
+.feature-item:nth-child(2) .feature-icon { background: rgba(0,229,255,0.1); }
+.feature-item:nth-child(3) .feature-icon { background: rgba(34,197,94,0.12); }
+.feature-item:nth-child(4) .feature-icon { background: rgba(255,215,0,0.1); }
+.feature-item h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text-bright);
+}
+.feature-item p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* ===== FORM / CTA ===== */
+.lead-form-section {
+  padding: 80px 24px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.lead-form-section .section-header { margin-bottom: 40px; }
+.lead-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.lead-form::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--pink), var(--cyan));
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted-light);
+  margin-bottom: 6px;
+}
+.form-group label .optional {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--cyan);
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #555;
+}
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+.form-group select option {
+  background: var(--bg-card);
+  color: var(--text);
+}
+.form-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.submit-btn {
+  width: 100%;
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.submit-btn:hover {
+  background: #e0107a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(255,20,147,0.25);
+}
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.form-success {
+  display: none;
+  text-align: center;
+  padding: 40px 20px;
+}
+.form-success.show { display: block; }
+.form-success .check {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+.form-success h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, var(--pink), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.form-success p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+footer a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .form-row { grid-template-columns: 1fr; }
+  .showcase-card { flex: 0 0 280px; }
+  .showcase-card.featured { flex: 0 0 300px; }
+  .lead-form { padding: 28px 20px; }
+  .steps { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-badge">🔥 Handcrafted from real lyrics</div>
+  <h1>
+    Wear the <span class="gradient">lyrics</span> that shaped you
+  </h1>
+  <p class="hero-sub">
+    Custom word cloud t-shirts built from your favorite songs. Every word sized by how often it appears — the phrases that matter most, biggest.
+  </p>
+  <a href="#order" class="hero-cta">
+    Design Yours
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </a>
+  <div class="hero-scroll">↓ scroll to explore</div>
+</section>
+
+<!-- ===== SHOWCASE ===== -->
+<section class="showcase">
+  <div class="section-header">
+    <h2>Every piece is <span style="background:linear-gradient(135deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">unique</span></h2>
+    <p>From single tracks to full albums — different masks, fonts, and color palettes. Here's what's possible.</p>
+  </div>
+
+  <div class="gallery-scroll">
+    <!-- Card 1: Hero — Forest Green Illustration -->
+    <div class="showcase-card featured">
+      <img class="card-img" src="v8_illustration_forest_dark.png" alt="Forest Green Face Illustration word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v8">v8 · Forest Green</span>
+        <h3>The Headliner</h3>
+        <p class="card-desc">Full album lyrics, face illustration mask, custom green palette. 7 layers, 2,500+ words.</p>
+      </div>
+    </div>
+
+    <!-- Card 2: v4 Original -->
+    <div class="showcase-card">
+      <img class="card-img" src="v4_illustration_dark.png" alt="Original face illustration word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v4">v4 · Original</span>
+        <h3>Where It Started</h3>
+        <p class="card-desc">Layer-stacking with collision detection. Colors pulled from the portrait itself.</p>
+      </div>
+    </div>
+
+    <!-- Card 3: v5 Phrases -->
+    <div class="showcase-card">
+      <img class="card-img" src="v5_illustration_dark.png" alt="Phrase mode word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v5">v5 · Phrases</span>
+        <h3>Words Become Lines</h3>
+        <p class="card-desc">Repeating phrases extracted and sized by frequency. The lines that hit hardest, biggest.</p>
+      </div>
+    </div>
+
+    <!-- Card 4: v7 Album -->
+    <div class="showcase-card">
+      <img class="card-img" src="v7_illustration_album_dark.png" alt="Frequency-weighted album word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v7">v7 · Frequency</span>
+        <h3>Full Album Depth</h3>
+        <p class="card-desc">24 songs. Smart dedup removes overlapping phrases. 171 unique phrases sized by repetition.</p>
+      </div>
+    </div>
+
+    <!-- Card 5: v8 Emerald -->
+    <div class="showcase-card">
+      <img class="card-img" src="v8_illustration_emerald_dark.png" alt="Emerald palette word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v8">v8 · Emerald</span>
+        <h3>Emerald Edition</h3>
+        <p class="card-desc">Custom color palette replaces mask colors. Deep emerald to bright lime accents.</p>
+      </div>
+    </div>
+
+    <!-- Card 6: Bangers Font -->
+    <div class="showcase-card">
+      <img class="card-img" src="v7_illustration_bangers_dark.png" alt="Bangers font word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v7">v7 · Font Variant</span>
+        <h3>Bangers Font</h3>
+        <p class="card-desc">Comic book energy. Same lyrics, completely different vibe — just swap the font.</p>
+      </div>
+    </div>
+
+    <!-- Card 7: v8 Jungle -->
+    <div class="showcase-card">
+      <img class="card-img" src="v8_illustration_jungle_dark.png" alt="Jungle palette word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v8">v8 · Jungle</span>
+        <h3>Jungle Palette</h3>
+        <p class="card-desc">Deepest greens to bright leaf white. Nature-inspired, high contrast on black.</p>
+      </div>
+    </div>
+
+    <!-- Card 8: Single Track -->
+    <div class="showcase-card">
+      <img class="card-img" src="v7_illustration_letout_dark.png" alt="Single track word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v7">v7 · Single Track</span>
+        <h3>One Song, Deep Dive</h3>
+        <p class="card-desc">"The Let Out" — single track mode pulls every phrase from one song. Dense and personal.</p>
+      </div>
+    </div>
+
+    <!-- Card 9: Displate Mask -->
+    <div class="showcase-card">
+      <img class="card-img" src="v7_displate_album_dark.png" alt="Displate mask word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v7">v7 · Displate Mask</span>
+        <h3>Different Silhouette</h3>
+        <p class="card-desc">Same album, different portrait shape. The mask defines the word cloud's outline.</p>
+      </div>
+    </div>
+
+    <!-- Card 10: Bebas Neue -->
+    <div class="showcase-card">
+      <img class="card-img" src="v7_illustration_bebasneue_dark.png" alt="Bebas Neue font word cloud" loading="lazy">
+      <div class="card-body">
+        <span class="card-label v7">v7 · Font Variant</span>
+        <h3>Bebas Neue</h3>
+        <p class="card-desc">Tall, condensed, editorial. Clean lines that feel like a magazine cover.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="how-it-works">
+  <div class="section-header">
+    <h2>How it works</h2>
+    <p>Three steps from idea to wearable art.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Pick your music</h3>
+      <p>Tell us the artist, album, or specific songs. Any genre, any language. The more lyrics, the richer the cloud.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Choose your look</h3>
+      <p>Pick a color palette (greens, reds, blues, custom hex), a mask shape (face, silhouette, portrait), and a font style.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>We make it</h3>
+      <p>Each piece is generated at high resolution, optimized for print. You get a preview before anything ships.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="features">
+  <div class="section-header">
+    <h2>Why <span style="background:linear-gradient(135deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">RapClouds</span></h2>
+  </div>
+  <div class="feature-grid">
+    <div class="feature-item">
+      <div class="feature-icon">🎯</div>
+      <div>
+        <h4>Lyric-Weighted</h4>
+        <p>Words sized by how often they actually appear in the music. The most meaningful phrases dominate visually.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🎨</div>
+      <div>
+        <h4>Custom Palettes</h4>
+        <p>Forest greens, deep blues, brand colors, or any hex code. Each layer gets a shade based on its visual weight.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">👕</div>
+      <div>
+        <h4>Print-Ready</h4>
+        <p>1200px+ resolution, transparent backgrounds, collision-free layering. Optimized for DTG and screen printing.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">✨</div>
+      <div>
+        <h4>One of One</h4>
+        <p>Your artist + your songs + your colors = a piece that no one else has. Every combination produces something different.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LEAD FORM ===== -->
+<section class="lead-form-section" id="order">
+  <div class="section-header">
+    <h2>Start your design</h2>
+    <p>Tell us what you want and we'll reach out with a preview.</p>
+  </div>
+
+  <div class="lead-form" id="leadForm">
+    <form id="orderForm" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Your name" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email <span class="optional">(or phone below)</span></label>
+          <input type="email" id="email" name="email" placeholder="you@email.com" autocomplete="email">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Phone <span class="optional">(or email above)</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" autocomplete="tel">
+        </div>
+        <div class="form-group">
+          <label for="format">Format</label>
+          <select id="format" name="format">
+            <option value="tshirt">T-Shirt</option>
+            <option value="poster">Poster / Wall Art</option>
+            <option value="displate">Displate / Metal Print</option>
+            <option value="sticker">Sticker / Decal</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="notes">What do you want?</label>
+        <textarea id="notes" name="notes" placeholder="Artist, specific songs or album, color preferences, font style, mask shape, any other details...&#10;&#10;Example: J. Cole — 2014 Forest Hills Drive, green tones, face illustration mask, bold font"></textarea>
+        <div class="form-hint">The more detail, the closer we get on the first draft.</div>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn">Send My Idea →</button>
+    </form>
+
+    <div class="form-success" id="formSuccess">
+      <div class="check">✨</div>
+      <h3>We got it!</h3>
+      <p>We'll review your notes and reach out within 24 hours with a preview concept.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  RapClouds — Word cloud art from the lyrics that matter.<br>
+  Built with Python, wordcloud, PIL, numpy. <a href="v4_gallery.html">View the full gallery →</a>
+</footer>
+
+<script>
+function handleSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('orderForm');
+  const btn = document.getElementById('submitBtn');
+  const success = document.getElementById('formSuccess');
+
+  // Validate at least one contact method
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  if (!email && !phone) {
+    alert('Please provide an email or phone number so we can reach you.');
+    return;
+  }
+
+  // Collect form data
+  const data = {
+    name: document.getElementById('name').value.trim(),
+    email: email,
+    phone: phone,
+    format: document.getElementById('format').value,
+    notes: document.getElementById('notes').value.trim(),
+    timestamp: new Date().toISOString(),
+    source: 'rapclouds_landing'
+  };
+
+  // Disable button
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  // Store in localStorage as backup + display
+  const submissions = JSON.parse(localStorage.getItem('rapclouds_submissions') || '[]');
+  submissions.push(data);
+  localStorage.setItem('rapclouds_submissions', JSON.stringify(submissions));
+
+  // Post to RapClouds form API
+  fetch('https://rapclouds-api.jordanchristley.com/api/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(r => r.json())
+  .then(resp => {
+    form.style.display = 'none';
+    success.classList.add('show');
+  })
+  .catch(err => {
+    // Fallback: stored in localStorage
+    console.warn('API unreachable, saved locally:', err);
+    form.style.display = 'none';
+    success.classList.add('show');
+  });
+}
+</script>
+
+</body>
+</html>

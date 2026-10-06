@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RapClouds — Word Cloud Gallery (v4–v8)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --text: #e0e0e0;
+  --muted: #888;
+  --pink: #FF1493;
+  --cyan: #00E5FF;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+.hero {
+  text-align: center;
+  padding: 60px 20px 40px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  background: linear-gradient(135deg, var(--pink), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+.hero p {
+  color: var(--muted);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 30px 20px;
+  flex-wrap: wrap;
+}
+.stat {
+  text-align: center;
+}
+.stat .num {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cyan);
+}
+.stat .label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: translateY(-4px);
+}
+.card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #000;
+}
+.card .info {
+  padding: 20px;
+}
+.card .info h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+.card .info .meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.card .info .meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.section-title {
+  text-align: center;
+  padding: 50px 20px 20px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+}
+.settings-table {
+  max-width: 800px;
+  margin: 20px auto 50px;
+  padding: 0 20px;
+}
+.settings-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.settings-table th, .settings-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #222;
+}
+.settings-table th {
+  color: var(--cyan);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.settings-table td:last-child {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.bug-fixes {
+  max-width: 800px;
+  margin: 0 auto 60px;
+  padding: 0 20px;
+}
+.bug-fixes h3 {
+  color: var(--pink);
+  margin-bottom: 12px;
+}
+.bug-fixes ul {
+  list-style: none;
+  padding: 0;
+}
+.bug-fixes li {
+  padding: 8px 0;
+  border-bottom: 1px solid #1a1a1a;
+  font-size: 0.95rem;
+}
+.bug-fixes li::before {
+  content: "✓ ";
+  color: var(--cyan);
+}
+footer {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  border-top: 1px solid #1a1a1a;
+}
+
+/* ===== RATING SYSTEM ===== */
+.rating-section {
+  padding: 0 20px 20px;
+  border-top: 1px solid #222;
+  margin-top: 12px;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* Flame button */
+.flame-btn {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+  padding: 4px;
+  transition: transform 0.15s, filter 0.3s;
+  filter: grayscale(1) brightness(0.4);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.flame-btn:hover {
+  transform: scale(1.15);
+}
+.flame-btn.rated {
+  filter: none;
+}
+/* Flame color classes */
+.flame-btn.rating-1  { filter: none; color: #FFD700; }
+.flame-btn.rating-2  { filter: none; color: #FFC800; }
+.flame-btn.rating-3  { filter: none; color: #FFB300; }
+.flame-btn.rating-4  { filter: none; color: #FF9800; }
+.flame-btn.rating-5  { filter: none; color: #FF7F00; }
+.flame-btn.rating-6  { filter: none; color: #FF6600; }
+.flame-btn.rating-7  { filter: none; color: #FF4500; }
+.flame-btn.rating-8  { filter: none; color: #E03000; }
+.flame-btn.rating-9  { filter: none; color: #4169E1; }
+.flame-btn.rating-10 { filter: none; color: #1E90FF; }
+
+.rating-number {
+  font-size: 0.85rem;
+  color: var(--muted);
+  min-width: 50px;
+}
+.rating-number.has-rating {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Feedback toggle */
+.feedback-toggle {
+  background: none;
+  border: 1px solid #333;
+  color: var(--muted);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+.feedback-toggle:hover {
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+/* Feedback panel */
+.feedback-panel {
+  display: none;
+  margin-top: 10px;
+}
+.feedback-panel.open {
+  display: block;
+}
+.feedback-panel textarea {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  resize: vertical;
+  min-height: 60px;
+  transition: border-color 0.2s;
+}
+.feedback-panel textarea:focus {
+  outline: none;
+  border-color: var(--cyan);
+}
+.feedback-panel textarea::placeholder {
+  color: #555;
+}
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.feedback-actions button {
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+.feedback-actions button:hover {
+  opacity: 0.85;
+}
+.feedback-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.feedback-saved {
+  color: var(--cyan);
+  font-size: 0.75rem;
+  display: none;
+}
+.feedback-saved.show {
+  display: inline;
+}
+
+/* Name modal */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+.modal h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--pink), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.modal p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+.modal input {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid #333;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.modal input:focus {
+  outline: none;
+  border-color: var(--cyan);
+}
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.modal-buttons button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+  transition: opacity 0.2s;
+}
+.modal-buttons .btn-primary {
+  background: var(--pink);
+  color: #fff;
+}
+.modal-buttons .btn-skip {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid #333;
+}
+.modal-buttons button:hover {
+  opacity: 0.85;
+}
+
+/* Visitor badge */
+.visitor-badge {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: var(--bg-card);
+  border: 1px solid #333;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  z-index: 100;
+}
+.visitor-badge .name {
+  color: var(--cyan);
+  font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<!-- Name Modal -->
+<div class="modal-overlay" id="nameModal">
+  <div class="modal">
+    <h3>Welcome to RapClouds 🔥</h3>
+    <p>Want to leave ratings and feedback? Drop your name so we know who's rating — totally optional.</p>
+    <input type="text" id="nameInput" placeholder="Your name (optional)" maxlength="30" autocomplete="off">
+    <div class="modal-buttons">
+      <button class="btn-primary" onclick="saveName()">Let's Go</button>
+      <button class="btn-skip" onclick="skipName()">Stay Anonymous</button>
+    </div>
+  </div>
+</div>
+
+<!-- Visitor Badge -->
+<div class="visitor-badge" id="visitorBadge" style="display:none;">
+  Rating as: <span class="name" id="badgeName"></span>
+</div>
+
+<div class="hero">
+  <h1>RapClouds v4–v8</h1>
+  <p>Layer-stacking word cloud portraits with collision detection, phrase weighting, custom color palettes, and 21 Love Yourz variants.</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="num">50%</div><div class="label">Coverage</div></div>
+  <div class="stat"><div class="num">3×</div><div class="label">More Words vs v3</div></div>
+  <div class="stat"><div class="num">0</div><div class="label">Layer Overlap</div></div>
+  <div class="stat"><div class="num">3</div><div class="label">Bugs Fixed</div></div>
+</div>
+
+<div class="gallery">
+  <div class="card" data-image="v4_displate">
+    <img src="v4_displate.jpg" alt="J. Cole Displate Portrait">
+    <div class="info">
+      <h3>Displate Portrait</h3>
+      <div class="meta">
+        <span>857×1200 → 1200×1680</span>
+        <span>6 layers</span>
+        <span>2,999 words</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v4_displate', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v4_displate">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v4_displate')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v4_displate">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v4_displate"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v4_displate')">Save</button>
+          <span class="feedback-saved" id="saved-v4_displate">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v4_illustration">
+    <img src="v4_illustration.jpg" alt="J. Cole Illustration">
+    <div class="info">
+      <h3>Face Illustration</h3>
+      <div class="meta">
+        <span>800×1422 → 800×1422</span>
+        <span>7 layers</span>
+        <span>4,479 words</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v4_illustration', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v4_illustration">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v4_illustration')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v4_illustration">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v4_illustration"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v4_illustration')">Save</button>
+          <span class="feedback-saved" id="saved-v4_illustration">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v4_cartoon">
+    <img src="v4_cartoon.jpg" alt="J. Cole Cartoon Portrait">
+    <div class="info">
+      <h3>Cartoon Portrait</h3>
+      <div class="meta">
+        <span>900×900 → 800×800</span>
+        <span>5 layers</span>
+        <span>2,501 words</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v4_cartoon', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v4_cartoon">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v4_cartoon')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v4_cartoon">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v4_cartoon"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v4_cartoon')">Save</button>
+          <span class="feedback-saved" id="saved-v4_cartoon">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--pink);" data-image="v5_cartoon_phrases">
+    <img src="v5_cartoon_phrases.png" alt="J. Cole Cartoon - v5 Phrases">
+    <div class="info">
+      <h3>v5 Phrase Mode ✨</h3>
+      <div class="meta">
+        <span>800×800</span>
+        <span>5 layers</span>
+        <span>2,152 words</span>
+        <span style="color: var(--pink);">3,152 phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v5_cartoon_phrases', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v5_cartoon_phrases">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v5_cartoon_phrases')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v5_cartoon_phrases">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v5_cartoon_phrases"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v5_cartoon_phrases')">Save</button>
+          <span class="feedback-saved" id="saved-v5_cartoon_phrases">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">v6 — Phrases + Layers + Collision Detection</h2>
+<div class="gallery">
+  <div class="card" style="border: 2px solid var(--cyan);" data-image="v6_illustration">
+    <img src="v6_illustration.png" alt="v6 Illustration - Multiline Phrases">
+    <div class="info">
+      <h3>v6 Face Illustration ✨</h3>
+      <div class="meta">
+        <span>800×1422</span>
+        <span>5 layers</span>
+        <span>664 words</span>
+        <span style="color: var(--cyan);">multiline phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v6_illustration', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v6_illustration">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v6_illustration')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v6_illustration">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v6_illustration"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v6_illustration')">Save</button>
+          <span class="feedback-saved" id="saved-v6_illustration">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--cyan);" data-image="v6_displate">
+    <img src="v6_displate.png" alt="v6 Displate - Multiline Phrases">
+    <div class="info">
+      <h3>v6 Displate ✨</h3>
+      <div class="meta">
+        <span>800×1120</span>
+        <span>5 layers</span>
+        <span>682 words</span>
+        <span style="color: var(--cyan);">multiline phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v6_displate', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v6_displate">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v6_displate')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v6_displate">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v6_displate"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v6_displate')">Save</button>
+          <span class="feedback-saved" id="saved-v6_displate">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--cyan);" data-image="v6_cartoon">
+    <img src="v6_cartoon.png" alt="v6 Cartoon - Multiline Phrases">
+    <div class="info">
+      <h3>v6 Cartoon ✨</h3>
+      <div class="meta">
+        <span>800×800</span>
+        <span>5 layers</span>
+        <span>409 words</span>
+        <span style="color: var(--cyan);">multiline phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v6_cartoon', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v6_cartoon">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v6_cartoon')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v6_cartoon">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v6_cartoon"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v6_cartoon')">Save</button>
+          <span class="feedback-saved" id="saved-v6_cartoon">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">v7 — Frequency-Weighted Phrases ✨</h2>
+<p style="color: var(--muted); text-align: center; margin-bottom: 30px;">Phrases sized by corpus frequency — most repeated = largest. Each phrase appears once. Smart dedup removes overlapping n-grams.</p>
+
+<h3 style="color: var(--cyan); text-align: center; margin: 30px 0 15px; font-size: 1.1rem;">Full Album (24 songs)</h3>
+<div class="gallery">
+  <div class="card" style="border: 2px solid var(--pink);" data-image="v7_illustration_album">
+    <img src="v7_illustration_album_dark.png" alt="v7 Face Illustration × Full Album">
+    <div class="info">
+      <h3>Face Illustration × Album</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span>2,511 words</span>
+        <span style="color: var(--pink);">171 phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_illustration_album', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_illustration_album">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_illustration_album')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_illustration_album">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_illustration_album"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_illustration_album')">Save</button>
+          <span class="feedback-saved" id="saved-v7_illustration_album">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--pink);" data-image="v7_displate_album">
+    <img src="v7_displate_album_dark.png" alt="v7 Displate × Full Album">
+    <div class="info">
+      <h3>Displate × Album</h3>
+      <div class="meta">
+        <span>1200×1680</span>
+        <span>6 layers</span>
+        <span>2,511 words</span>
+        <span style="color: var(--pink);">171 phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_displate_album', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_displate_album">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_displate_album')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_displate_album">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_displate_album"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_displate_album')">Save</button>
+          <span class="feedback-saved" id="saved-v7_displate_album">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--pink);" data-image="v7_cartoon_album">
+    <img src="v7_cartoon_album_dark.png" alt="v7 Cartoon × Full Album">
+    <div class="info">
+      <h3>Cartoon × Album</h3>
+      <div class="meta">
+        <span>1200×1200</span>
+        <span>4 layers</span>
+        <span>2,511 words</span>
+        <span style="color: var(--pink);">171 phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_cartoon_album', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_cartoon_album">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_cartoon_album')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_cartoon_album">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_cartoon_album"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_cartoon_album')">Save</button>
+          <span class="feedback-saved" id="saved-v7_cartoon_album">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: var(--cyan); text-align: center; margin: 30px 0 15px; font-size: 1.1rem;">Single Tracks</h3>
+<div class="gallery">
+  <div class="card" style="border: 2px solid var(--gold);" data-image="v7_illustration_letout">
+    <img src="v7_illustration_letout_dark.png" alt="v7 Face Illustration × The Let Out">
+    <div class="info">
+      <h3>Face Illustration × The Let Out</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: var(--gold);">single track</span>
+        <span>dense phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_illustration_letout', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_illustration_letout">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_illustration_letout')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_illustration_letout">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_illustration_letout"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_illustration_letout')">Save</button>
+          <span class="feedback-saved" id="saved-v7_illustration_letout">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--gold);" data-image="v7_displate_villest">
+    <img src="v7_displate_villest_dark.png" alt="v7 Displate × The Villest">
+    <div class="info">
+      <h3>Displate × The Villest</h3>
+      <div class="meta">
+        <span>1200×1680</span>
+        <span>6 layers</span>
+        <span style="color: var(--gold);">single track</span>
+        <span>dense phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_displate_villest', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_displate_villest">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_displate_villest')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_displate_villest">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_displate_villest"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_displate_villest')">Save</button>
+          <span class="feedback-saved" id="saved-v7_displate_villest">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">v7 Random Font Explorations 🎲</h2>
+<p style="color: var(--muted); text-align: center; margin-bottom: 30px;">Random combinations of fonts, masks, and songs. Same v7 engine, different aesthetic.</p>
+<div class="gallery">
+  <div class="card" style="border: 1px solid var(--border-light);" data-image="random_ocean_dejavu">
+    <img src="cartoon_Ocean_Way_dejavu_1000px_dark.png" alt="Cartoon × Ocean Way (DejaVu)">
+    <div class="info">
+      <h3>Ocean Way × Cartoon</h3>
+      <div class="meta">
+        <span>DejaVu Bold</span>
+        <span>1000px</span>
+        <span>5 layers</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('random_ocean_dejavu', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-random_ocean_dejavu">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('random_ocean_dejavu')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-random_ocean_dejavu">
+        <textarea placeholder="What do you think about this piece?" id="textarea-random_ocean_dejavu"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('random_ocean_dejavu')">Save</button>
+          <span class="feedback-saved" id="saved-random_ocean_dejavu">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 1px solid var(--border-light);" data-image="random_twosix_archivo">
+    <img src="cartoon_Two_Six_archivoblack_1200px_dark.png" alt="Cartoon × Two Six (Archivo Black)">
+    <div class="info">
+      <h3>Two Six × Cartoon</h3>
+      <div class="meta">
+        <span>Archivo Black</span>
+        <span>1200px</span>
+        <span>4 layers</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('random_twosix_archivo', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-random_twosix_archivo">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('random_twosix_archivo')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-random_twosix_archivo">
+        <textarea placeholder="What do you think about this piece?" id="textarea-random_twosix_archivo"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('random_twosix_archivo')">Save</button>
+          <span class="feedback-saved" id="saved-random_twosix_archivo">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 1px solid var(--border-light);" data-image="random_album_oswald">
+    <img src="cartoon_album_oswald_1200px_dark.png" alt="Cartoon × Album (Oswald)">
+    <div class="info">
+      <h3>Album × Cartoon</h3>
+      <div class="meta">
+        <span>Oswald</span>
+        <span>1200px</span>
+        <span>4 layers</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('random_album_oswald', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-random_album_oswald">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('random_album_oswald')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-random_album_oswald">
+        <textarea placeholder="What do you think about this piece?" id="textarea-random_album_oswald"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('random_album_oswald')">Save</button>
+          <span class="feedback-saved" id="saved-random_album_oswald">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 1px solid var(--border-light);" data-image="random_bombs_oswald">
+    <img src="displate_Bombs_in_the_Ville_oswald_1000px_dark.png" alt="Displate × Bombs in the Ville (Oswald)">
+    <div class="info">
+      <h3>Bombs in the Ville × Displate</h3>
+      <div class="meta">
+        <span>Oswald</span>
+        <span>1000px</span>
+        <span>6 layers</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('random_bombs_oswald', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-random_bombs_oswald">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('random_bombs_oswald')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-random_bombs_oswald">
+        <textarea placeholder="What do you think about this piece?" id="textarea-random_bombs_oswald"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('random_bombs_oswald')">Save</button>
+          <span class="feedback-saved" id="saved-random_bombs_oswald">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 1px solid var(--border-light);" data-image="random_lifesentence_archivo">
+    <img src="illustration_Life_Sentence_archivoblack_1200px_dark.png" alt="Illustration × Life Sentence (Archivo Black)">
+    <div class="info">
+      <h3>Life Sentence × Illustration</h3>
+      <div class="meta">
+        <span>Archivo Black</span>
+        <span>1200px</span>
+        <span>7 layers</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('random_lifesentence_archivo', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-random_lifesentence_archivo">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('random_lifesentence_archivo')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-random_lifesentence_archivo">
+        <textarea placeholder="What do you think about this piece?" id="textarea-random_lifesentence_archivo"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('random_lifesentence_archivo')">Save</button>
+          <span class="feedback-saved" id="saved-random_lifesentence_archivo">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 1px solid var(--border-light);" data-image="random_legacy_archivo">
+    <img src="illustration_Legacy_archivoblack_1200px_dark.png" alt="Illustration × Legacy (Archivo Black)">
+    <div class="info">
+      <h3>Legacy × Illustration</h3>
+      <div class="meta">
+        <span>Archivo Black</span>
+        <span>1200px</span>
+        <span>7 layers</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('random_legacy_archivo', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-random_legacy_archivo">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('random_legacy_archivo')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-random_legacy_archivo">
+        <textarea placeholder="What do you think about this piece?" id="textarea-random_legacy_archivo"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('random_legacy_archivo')">Save</button>
+          <span class="feedback-saved" id="saved-random_legacy_archivo">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LOVE YOURZ — J. Cole (2014 Forest Hills Drive)                       -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 class="section-title" style="color: var(--pink);">🎤 Love Yourz — J. Cole</h2>
+<p style="color: var(--muted); text-align: center; margin-bottom: 10px;">Single track from <em>2014 Forest Hills Drive</em>. All versions use the same lyrics file.</p>
+
+<h3 style="color: var(--cyan); text-align: center; margin: 30px 0 15px; font-size: 1.1rem;">v4 — Default (Mask Colors)</h3>
+<div class="gallery">
+  <div class="card" data-image="v4_lyourz_illustration">
+    <img src="v4_illustration_dark.png" alt="v4 Love Yourz × Face Illustration">
+    <div class="info">
+      <h3>Face Illustration</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: var(--pink);">Love Yourz</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v4_lyourz_illustration', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v4_lyourz_illustration">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v4_lyourz_illustration')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v4_lyourz_illustration">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v4_lyourz_illustration"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v4_lyourz_illustration')">Save</button>
+          <span class="feedback-saved" id="saved-v4_lyourz_illustration">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v4_lyourz_displate">
+    <img src="v4_displate_dark.png" alt="v4 Love Yourz × Displate">
+    <div class="info">
+      <h3>Displate</h3>
+      <div class="meta">
+        <span>1200×1680</span>
+        <span>6 layers</span>
+        <span style="color: var(--pink);">Love Yourz</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v4_lyourz_displate', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v4_lyourz_displate">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v4_lyourz_displate')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v4_lyourz_displate">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v4_lyourz_displate"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v4_lyourz_displate')">Save</button>
+          <span class="feedback-saved" id="saved-v4_lyourz_displate">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v4_lyourz_cartoon">
+    <img src="v4_cartoon_dark.png" alt="v4 Love Yourz × Cartoon">
+    <div class="info">
+      <h3>Cartoon</h3>
+      <div class="meta">
+        <span>1200×1200</span>
+        <span>4 layers</span>
+        <span style="color: var(--pink);">Love Yourz</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v4_lyourz_cartoon', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v4_lyourz_cartoon">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v4_lyourz_cartoon')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v4_lyourz_cartoon">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v4_lyourz_cartoon"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v4_lyourz_cartoon')">Save</button>
+          <span class="feedback-saved" id="saved-v4_lyourz_cartoon">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: var(--cyan); text-align: center; margin: 30px 0 15px; font-size: 1.1rem;">v5 — Phrases Mode</h3>
+<div class="gallery">
+  <div class="card" style="border: 2px solid var(--pink);" data-image="v5_lyourz_illustration">
+    <img src="v5_illustration_dark.png" alt="v5 Love Yourz × Face Illustration">
+    <div class="info">
+      <h3>Face Illustration ✨</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: var(--pink);">phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v5_lyourz_illustration', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v5_lyourz_illustration">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v5_lyourz_illustration')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v5_lyourz_illustration">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v5_lyourz_illustration"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v5_lyourz_illustration')">Save</button>
+          <span class="feedback-saved" id="saved-v5_lyourz_illustration">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--pink);" data-image="v5_lyourz_displate">
+    <img src="v5_displate_dark.png" alt="v5 Love Yourz × Displate">
+    <div class="info">
+      <h3>Displate ✨</h3>
+      <div class="meta">
+        <span>1200×1680</span>
+        <span>6 layers</span>
+        <span style="color: var(--pink);">phrases</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v5_lyourz_displate', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v5_lyourz_displate">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v5_lyourz_displate')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v5_lyourz_displate">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v5_lyourz_displate"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v5_lyourz_displate')">Save</button>
+          <span class="feedback-saved" id="saved-v5_lyourz_displate">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: var(--cyan); text-align: center; margin: 30px 0 15px; font-size: 1.1rem;">v7 — Frequency-Weighted Phrases (Default Font)</h3>
+<div class="gallery">
+  <div class="card" style="border: 2px solid var(--gold);" data-image="v7_lyourz_illustration">
+    <img src="v7_illustration_lyourz_dark.png" alt="v7 Love Yourz × Face Illustration">
+    <div class="info">
+      <h3>Face Illustration × Love Yourz</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: var(--gold);">single track</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_illustration', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_illustration">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_illustration')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_illustration">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_illustration"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_illustration')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_illustration">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--gold);" data-image="v7_lyourz_displate">
+    <img src="v7_displate_lyourz_dark.png" alt="v7 Love Yourz × Displate">
+    <div class="info">
+      <h3>Displate × Love Yourz</h3>
+      <div class="meta">
+        <span>1200×1680</span>
+        <span>6 layers</span>
+        <span style="color: var(--gold);">single track</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_displate', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_displate">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_displate')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_displate">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_displate"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_displate')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_displate">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid var(--gold);" data-image="v7_lyourz_cartoon">
+    <img src="v7_cartoon_lyourz_dark.png" alt="v7 Love Yourz × Cartoon">
+    <div class="info">
+      <h3>Cartoon × Love Yourz</h3>
+      <div class="meta">
+        <span>1200×1200</span>
+        <span>4 layers</span>
+        <span style="color: var(--gold);">single track</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_cartoon', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_cartoon">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_cartoon')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_cartoon">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_cartoon"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_cartoon')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_cartoon">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: var(--cyan); text-align: center; margin: 30px 0 15px; font-size: 1.1rem;">v7 — Font Variants 🎨</h3>
+<p style="color: var(--muted); text-align: center; margin-bottom: 20px;">Same lyrics, same mask (Face Illustration), different display fonts.</p>
+<div class="gallery">
+  <div class="card" data-image="v7_lyourz_anton">
+    <img src="v7_illustration_anton_dark.png" alt="v7 Love Yourz × Anton">
+    <div class="info">
+      <h3>Anton</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span>Display Sans</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_anton', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_anton">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_anton')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_anton">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_anton"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_anton')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_anton">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v7_lyourz_bangers">
+    <img src="v7_illustration_bangers_dark.png" alt="v7 Love Yourz × Bangers">
+    <div class="info">
+      <h3>Bangers</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span>Comic Book</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_bangers', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_bangers">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_bangers')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_bangers">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_bangers"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_bangers')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_bangers">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v7_lyourz_bebasneue">
+    <img src="v7_illustration_bebasneue_dark.png" alt="v7 Love Yourz × Bebas Neue">
+    <div class="info">
+      <h3>Bebas Neue</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span>Condensed</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_bebasneue', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_bebasneue">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_bebasneue')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_bebasneue">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_bebasneue"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_bebasneue')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_bebasneue">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v7_lyourz_blackops">
+    <img src="v7_illustration_blackops_dark.png" alt="v7 Love Yourz × Black Ops One">
+    <div class="info">
+      <h3>Black Ops One</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span>Military Stencil</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_blackops', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_blackops">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_blackops')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_blackops">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_blackops"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_blackops')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_blackops">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v7_lyourz_bungee">
+    <img src="v7_illustration_bungee_dark.png" alt="v7 Love Yourz × Bungee">
+    <div class="info">
+      <h3>Bungee</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span>Display Slab</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_bungee', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_bungee">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_bungee')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_bungee">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_bungee"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_bungee')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_bungee">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" data-image="v7_lyourz_squadaone">
+    <img src="v7_illustration_squadaone_dark.png" alt="v7 Love Yourz × Squada One">
+    <div class="info">
+      <h3>Squada One</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span>Display Rounded</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v7_lyourz_squadaone', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v7_lyourz_squadaone">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v7_lyourz_squadaone')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v7_lyourz_squadaone">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v7_lyourz_squadaone"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v7_lyourz_squadaone')">Save</button>
+          <span class="feedback-saved" id="saved-v7_lyourz_squadaone">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title" style="color: #22c55e;">🌲 v8 — Green Palette Mode</h2>
+<p style="color: var(--muted); text-align: center; margin-bottom: 10px;">Custom color palettes replace mask-based colors. Forest/emerald greens with lime and white accents.</p>
+
+<h3 style="color: #22c55e; text-align: center; margin: 30px 0 15px; font-size: 1.1rem;">Forest Green Palette — All Masks</h3>
+<div class="gallery">
+  <div class="card" style="border: 2px solid #22c55e;" data-image="v8_lyourz_forest_illustration">
+    <img src="v8_illustration_forest_dark.png" alt="v8 Forest Green × Face Illustration">
+    <div class="info">
+      <h3>Face Illustration 🌲</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: #22c55e;">forest-green</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v8_lyourz_forest_illustration', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v8_lyourz_forest_illustration">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v8_lyourz_forest_illustration')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v8_lyourz_forest_illustration">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v8_lyourz_forest_illustration"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v8_lyourz_forest_illustration')">Save</button>
+          <span class="feedback-saved" id="saved-v8_lyourz_forest_illustration">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid #22c55e;" data-image="v8_lyourz_forest_displate">
+    <img src="v8_displate_forest_dark.png" alt="v8 Forest Green × Displate">
+    <div class="info">
+      <h3>Displate 🌲</h3>
+      <div class="meta">
+        <span>1200×1680</span>
+        <span>6 layers</span>
+        <span style="color: #22c55e;">forest-green</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v8_lyourz_forest_displate', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v8_lyourz_forest_displate">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v8_lyourz_forest_displate')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v8_lyourz_forest_displate">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v8_lyourz_forest_displate"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v8_lyourz_forest_displate')">Save</button>
+          <span class="feedback-saved" id="saved-v8_lyourz_forest_displate">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid #22c55e;" data-image="v8_lyourz_forest_cartoon">
+    <img src="v8_cartoon_forest_dark.png" alt="v8 Forest Green × Cartoon">
+    <div class="info">
+      <h3>Cartoon 🌲</h3>
+      <div class="meta">
+        <span>1200×1200</span>
+        <span>4 layers</span>
+        <span style="color: #22c55e;">forest-green</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v8_lyourz_forest_cartoon', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v8_lyourz_forest_cartoon">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v8_lyourz_forest_cartoon')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v8_lyourz_forest_cartoon">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v8_lyourz_forest_cartoon"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v8_lyourz_forest_cartoon')">Save</button>
+          <span class="feedback-saved" id="saved-v8_lyourz_forest_cartoon">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="color: #22c55e; text-align: center; margin: 30px 0 15px; font-size: 1.1rem;">Green Palette Variants — Face Illustration</h3>
+<div class="gallery">
+  <div class="card" style="border: 2px solid #059669;" data-image="v8_lyourz_emerald">
+    <img src="v8_illustration_emerald_dark.png" alt="v8 Emerald Palette">
+    <div class="info">
+      <h3>Emerald</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: #059669;">emerald palette</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v8_lyourz_emerald', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v8_lyourz_emerald">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v8_lyourz_emerald')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v8_lyourz_emerald">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v8_lyourz_emerald"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v8_lyourz_emerald')">Save</button>
+          <span class="feedback-saved" id="saved-v8_lyourz_emerald">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid #166534;" data-image="v8_lyourz_brand">
+    <img src="v8_illustration_brand_dark.png" alt="v8 Brand Green Palette">
+    <div class="info">
+      <h3>Brand Green</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: #166534;">brand-green palette</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v8_lyourz_brand', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v8_lyourz_brand">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v8_lyourz_brand')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v8_lyourz_brand">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v8_lyourz_brand"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v8_lyourz_brand')">Save</button>
+          <span class="feedback-saved" id="saved-v8_lyourz_brand">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid #2ecc40;" data-image="v8_lyourz_jungle">
+    <img src="v8_illustration_jungle_dark.png" alt="v8 Jungle Palette">
+    <div class="info">
+      <h3>Jungle</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: #2ecc40;">jungle palette</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v8_lyourz_jungle', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v8_lyourz_jungle">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v8_lyourz_jungle')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v8_lyourz_jungle">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v8_lyourz_jungle"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v8_lyourz_jungle')">Save</button>
+          <span class="feedback-saved" id="saved-v8_lyourz_jungle">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="border: 2px solid #84cc16;" data-image="v8_lyourz_lime">
+    <img src="v8_illustration_lime_dark.png" alt="v8 Lime Dark Palette">
+    <div class="info">
+      <h3>Lime Dark</h3>
+      <div class="meta">
+        <span>1200×2134</span>
+        <span>7 layers</span>
+        <span style="color: #84cc16;">lime-dark palette</span>
+      </div>
+    </div>
+    <div class="rating-section">
+      <div class="rating-row">
+        <button class="flame-btn" onclick="rateImage('v8_lyourz_lime', this)" title="Click to rate 1-10">🔥</button>
+        <span class="rating-number" id="rating-v8_lyourz_lime">Rate this</span>
+        <button class="feedback-toggle" onclick="toggleFeedback('v8_lyourz_lime')">💬 Feedback</button>
+      </div>
+      <div class="feedback-panel" id="feedback-v8_lyourz_lime">
+        <textarea placeholder="What do you think about this piece?" id="textarea-v8_lyourz_lime"></textarea>
+        <div class="feedback-actions">
+          <button onclick="saveFeedback('v8_lyourz_lime')">Save</button>
+          <span class="feedback-saved" id="saved-v8_lyourz_lime">✓ Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">Optimized Settings</h2>
+<div class="settings-table">
+  <table>
+    <tr><th>Setting</th><th>v3</th><th>v4</th><th>Why</th></tr>
+    <tr><td>min_font_size</td><td>4</td><td>3</td><td>Biggest lever — nearly doubles words placed</td></tr>
+    <tr><td>max_font_size</td><td>50</td><td>100</td><td>Bigger focal words improve coverage ~4%</td></tr>
+    <tr><td>max_words</td><td>800</td><td>3,000</td><td>Canvas fills before this limit</td></tr>
+    <tr><td>mode</td><td>RGB</td><td>RGBA</td><td>Required for proper transparency/collision</td></tr>
+    <tr><td>collision detection</td><td>None</td><td>Yes</td><td>Cumulative occupancy bitmap between layers</td></tr>
+    <tr><td>aspect ratio</td><td>Forced square</td><td>Preserved</td><td>No more distortion</td></tr>
+  </table>
+</div>
+
+<h2 class="section-title">Saturation Data</h2>
+<div class="settings-table">
+  <table>
+    <tr><th>max_words</th><th>Words Placed</th><th>Coverage</th><th>Time</th></tr>
+    <tr><td>500</td><td>500</td><td>39.4%</td><td>33s</td></tr>
+    <tr><td>1,000</td><td>1,000</td><td>44.7%</td><td>75s</td></tr>
+    <tr><td>1,500</td><td>1,500</td><td>47.1%</td><td>140s</td></tr>
+    <tr><td>2,000</td><td>2,000</td><td>47.0%</td><td>114s</td></tr>
+    <tr><td>2,500</td><td>2,183</td><td>47.0%</td><td>113s</td></tr>
+    <tr><td>3,000</td><td>2,183</td><td>47.3%</td><td>132s</td></tr>
+    <tr><td>5,000 + max_font=100</td><td>2,183</td><td>49.9%</td><td>134s</td></tr>
+  </table>
+</div>
+
+<div class="bug-fixes">
+  <h3>Bugs Fixed from v3</h3>
+  <ul>
+    <li><strong>mode='RGB' default</strong> — broke occupancy detection (alpha=255 everywhere → 100% occupancy → no room for other layers)</li>
+    <li><strong>Dark pixel thresholding order</strong> — rasterizing occupancy after thresholding made dark words invisible to collision detection</li>
+    <li><strong>wc.words_ ≠ placed count</strong> — was reporting vocab size instead of actual words on canvas</li>
+  </ul>
+</div>
+
+<footer>
+  RapClouds v4 — Word cloud layer stacking with collision detection<br>
+  Built with Python, wordcloud, PIL, numpy
+</footer>
+
+<script>
+// ===== API =====
+const API = window.location.origin;  // same origin (rapclouds-api.jordanchristley.com)
+
+// ===== DEVICE FINGERPRINTING (client-side only, for device_id) =====
+function getDeviceId() {
+  let id = localStorage.getItem('rapclouds_device_id');
+  if (id) return id;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top';
+  ctx.font = '14px Arial';
+  ctx.fillText('RapClouds', 2, 2);
+  const canvasHash = canvas.toDataURL().slice(-50);
+  const signals = [
+    navigator.userAgent, navigator.language,
+    screen.width + 'x' + screen.height, screen.colorDepth,
+    new Date().getTimezoneOffset(), navigator.hardwareConcurrency || 0,
+    canvasHash
+  ].join('|');
+  let hash = 0;
+  for (let i = 0; i < signals.length; i++) {
+    hash = ((hash << 5) - hash) + signals.charCodeAt(i);
+    hash |= 0;
+  }
+  id = 'rc_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
+  localStorage.setItem('rapclouds_device_id', id);
+  return id;
+}
+
+// ===== NAME MANAGEMENT =====
+let _visitorName = null;
+
+function getVisitorName() { return _visitorName; }
+
+async function checkExistingName() {
+  const deviceId = getDeviceId();
+  try {
+    const res = await fetch(API + '/api/name?id=' + encodeURIComponent(deviceId));
+    const data = await res.json();
+    if (data.name) {
+      _visitorName = data.name;
+      localStorage.setItem('rapclouds_name_asked', 'true');
+    }
+  } catch(e) { /* offline or error — skip */ }
+}
+
+function saveName() {
+  const input = document.getElementById('nameInput');
+  const name = input.value.trim();
+  if (name) {
+    _visitorName = name;
+    localStorage.setItem('rapclouds_name_asked', 'true');
+    // Save to server
+    fetch(API + '/api/name', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ device_id: getDeviceId(), name })
+    }).catch(() => {});
+  }
+  localStorage.setItem('rapclouds_name_asked', 'true');
+  document.getElementById('nameModal').classList.remove('open');
+  updateBadge();
+  completePendingRating();
+}
+
+function skipName() {
+  localStorage.setItem('rapclouds_name_asked', 'true');
+  document.getElementById('nameModal').classList.remove('open');
+  updateBadge();
+  completePendingRating();
+}
+
+function completePendingRating() {
+  if (window._pendingRating) {
+    const { imageId, btn } = window._pendingRating;
+    window._pendingRating = null;
+    doRate(imageId, btn);
+  }
+}
+
+function updateBadge() {
+  const name = getVisitorName();
+  const badge = document.getElementById('visitorBadge');
+  const badgeName = document.getElementById('badgeName');
+  badgeName.textContent = name || 'Anonymous';
+  badge.style.display = 'block';
+}
+
+// ===== FLAME RATING =====
+const flameColors = {
+  1:  '#FFD700', 2:  '#FFC800', 3:  '#FFB300',
+  4:  '#FF9800', 5:  '#FF7F00', 6:  '#FF6600',
+  7:  '#FF4500', 8:  '#E03000', 9:  '#4169E1', 10: '#1E90FF',
+};
+
+function rateImage(imageId, btn) {
+  if (!localStorage.getItem('rapclouds_name_asked')) {
+    window._pendingRating = { imageId, btn };
+    document.getElementById('nameModal').classList.add('open');
+    document.getElementById('nameInput').focus();
+    return;
+  }
+  doRate(imageId, btn);
+}
+
+function doRate(imageId, btn) {
+  const deviceId = getDeviceId();
+  // Read current local state
+  const localRatings = JSON.parse(localStorage.getItem('rapclouds_ratings') || '{}');
+  let current = localRatings[imageId] || 0;
+  current = current >= 10 ? 0 : current + 1;
+  localRatings[imageId] = current;
+  localStorage.setItem('rapclouds_ratings', JSON.stringify(localRatings));
+  updateFlameUI(imageId, current, btn);
+  // POST to server (fire and forget)
+  fetch(API + '/api/rate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ device_id: deviceId, image_id: imageId, rating: current })
+  }).catch(() => {});
+}
+
+function updateFlameUI(imageId, rating, btn) {
+  const label = document.getElementById('rating-' + imageId);
+  btn.className = 'flame-btn';
+  if (rating === 0) {
+    label.textContent = 'Rate this';
+    label.className = 'rating-number';
+  } else {
+    btn.classList.add('rated', 'rating-' + rating);
+    btn.style.color = flameColors[rating];
+    label.textContent = rating + '/10';
+    label.className = 'rating-number has-rating';
+  }
+}
+
+// ===== FEEDBACK =====
+function toggleFeedback(imageId) {
+  document.getElementById('feedback-' + imageId).classList.toggle('open');
+}
+
+function saveFeedback(imageId) {
+  const textarea = document.getElementById('textarea-' + imageId);
+  const text = textarea.value.trim();
+  if (!text) return;
+  const name = getVisitorName() || 'Anonymous';
+  const deviceId = getDeviceId();
+  // POST to server
+  fetch(API + '/api/feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ device_id: deviceId, name, image_id: imageId, text })
+  }).then(() => {
+    const savedEl = document.getElementById('saved-' + imageId);
+    savedEl.classList.add('show');
+    setTimeout(() => savedEl.classList.remove('show'), 2000);
+  }).catch(() => {});
+  textarea.value = '';
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async function() {
+  const deviceId = getDeviceId();
+
+  // Check if server knows this device's name
+  await checkExistingName();
+
+  // Show name modal if never asked AND server doesn't have a name for this device
+  if (!localStorage.getItem('rapclouds_name_asked') && !_visitorName) {
+    setTimeout(() => {
+      document.getElementById('nameModal').classList.add('open');
+      document.getElementById('nameInput').focus();
+    }, 1500);
+  }
+
+  updateBadge();
+
+  // Restore ratings from localStorage (instant), then try server for fresh data
+  const localRatings = JSON.parse(localStorage.getItem('rapclouds_ratings') || '{}');
+  document.querySelectorAll('.flame-btn').forEach(btn => {
+    const card = btn.closest('.card');
+    if (!card) return;
+    const imageId = card.getAttribute('data-image');
+    if (!imageId) return;
+    const rating = localRatings[imageId] || 0;
+    if (rating > 0) updateFlameUI(imageId, rating, btn);
+  });
+
+  // Try to fetch this device's ratings from server to sync
+  try {
+    const res = await fetch(API + '/api/ratings');
+    const allRatings = await res.json();
+    const serverRatings = allRatings[deviceId] || {};
+    // Merge: server wins if it has a value
+    const merged = { ...localRatings };
+    for (const [img, rat] of Object.entries(serverRatings)) {
+      merged[img] = rat;
+    }
+    localStorage.setItem('rapclouds_ratings', JSON.stringify(merged));
+    // Re-render all flames with merged data
+    document.querySelectorAll('.flame-btn').forEach(btn => {
+      const card = btn.closest('.card');
+      if (!card) return;
+      const imageId = card.getAttribute('data-image');
+      if (!imageId) return;
+      updateFlameUI(imageId, merged[imageId] || 0, btn);
+    });
+  } catch(e) { /* offline — use localStorage only */ }
+
+  // Enter key on name input
+  document.getElementById('nameInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') saveName();
+  });
+});
+</script>
+
+</body>
+</html>
