@@ -18,9 +18,9 @@ export default function LandingFooter(): JSX.Element {
           <Link to="/karaoke" className="text-sm transition-colors hover:text-white">
             Karaoke
           </Link>
-          <Link to="/#order" className="text-sm transition-colors hover:text-white">
+          <a href="#order" className="text-sm transition-colors hover:text-white">
             Order
-          </Link>
+          </a>
         </nav>
         <p className="mt-2 text-xs" style={{ color: 'var(--muted)', opacity: 0.75 }}>
           Built for lyric lovers. All artwork generated from user-provided lyrics.

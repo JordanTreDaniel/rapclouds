@@ -1,5 +1,4 @@
 import type { JSX } from 'react';
-import { Link } from 'react-router-dom';
 import SplashDecor from './SplashDecor';
 
 export default function Hero(): JSX.Element {
@@ -21,9 +20,9 @@ export default function Hero(): JSX.Element {
           Every RapClouds piece is built from the words that moved you. Real lyrics. Your favorite artist. Your words, wearable.
         </p>
         <div className="mt-2 flex flex-wrap items-center justify-center gap-4">
-          <Link to="/#order" className="rc-btn rc-btn-primary rc-btn-primary-lg">
+          <a href="#order" className="rc-btn rc-btn-primary rc-btn-primary-lg">
             Order Now
-          </Link>
+          </a>
           <a href="#gallery" className="rc-btn rc-btn-secondary">
             See the gallery
           </a>

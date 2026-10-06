@@ -36,9 +36,9 @@ export default function DualPath(): JSX.Element {
                 Custom word-cloud apparel and prints built from any song you love. The words are the art. Pick a song, pick a look, wear it.
               </p>
               <div className="mt-auto pt-3">
-                <Link to="/#order" className="rc-btn rc-btn-primary">
+                <a href="#order" className="rc-btn rc-btn-primary">
                   Order Now
-                </Link>
+                </a>
               </div>
             </div>
           </div>

@@ -31,7 +31,7 @@ export default function LandingHeader() {
       <nav className="landing-header__nav">
         <Link to="/create" className="landing-header__link">Create</Link>
         <Link to="/karaoke" className="landing-header__link">Karaoke</Link>
-        <Link to="/#order" className="rc-btn rc-btn-primary rc-btn-mini">Order Now</Link>
+        <a href="#order" className="rc-btn rc-btn-primary rc-btn-mini">Order Now</a>
       </nav>
     </header>
   );
