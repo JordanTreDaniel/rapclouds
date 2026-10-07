@@ -9,6 +9,7 @@ export default function Hero(): JSX.Element {
         <img
           src="/brand/rapclouds-logo-lyric-lovers.png"
           alt="RapClouds"
+          data-annot-target="hero:logo"
           className="h-auto w-[min(420px,70vw)]"
           loading="eager"
           fetchPriority="high"

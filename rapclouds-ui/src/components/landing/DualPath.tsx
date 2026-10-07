@@ -18,7 +18,7 @@ export default function DualPath(): JSX.Element {
         </h2>
         <div className="mt-8 grid w-full gap-6 md:grid-cols-2">
           <div data-reveal="">
-            <div className="rc-card rc-card-featured flex h-full flex-col gap-5 text-left">
+            <div className="rc-card rc-card-featured flex h-full flex-col gap-5 text-left" data-annot-target="card:dualpath-wear">
               <svg
                 aria-hidden="true"
                 className="h-10 w-10 text-[color:var(--rc-gold)]"
@@ -43,7 +43,7 @@ export default function DualPath(): JSX.Element {
             </div>
           </div>
           <div data-reveal="" style={cardDelay}>
-            <div className="rc-card rc-card-featured flex h-full flex-col gap-5 text-left">
+            <div className="rc-card rc-card-featured flex h-full flex-col gap-5 text-left" data-annot-target="card:dualpath-test">
               <svg
                 aria-hidden="true"
                 className="h-10 w-10 text-[color:var(--rc-cyan)]"

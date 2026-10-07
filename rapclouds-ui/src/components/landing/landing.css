@@ -459,3 +459,347 @@
     animation: none !important;
   }
 }
+
+.rc-curator [data-annot-target] {
+  cursor: pointer;
+}
+
+.rc-curator [data-annot-target]:hover,
+.rc-curator [data-annot-target]:focus-visible {
+  outline: 2px dashed rgba(255, 255, 255, 0.35);
+  outline-offset: 4px;
+}
+
+.rc-annot-hidden {
+  opacity: 0.4;
+  position: relative;
+}
+
+[data-reveal].rc-annot-hidden {
+  opacity: 0;
+}
+
+[data-reveal].rc-annot-hidden.rc-revealed {
+  opacity: 0.4;
+}
+
+.rc-annot-hidden::after {
+  background: var(--bg-elevated, #14141c);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  color: var(--text-bright, #ffffff);
+  content: 'Hidden from public';
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  left: 14px;
+  letter-spacing: 0.16em;
+  padding: 4px 10px;
+  position: absolute;
+  text-transform: uppercase;
+  top: 14px;
+  z-index: 6;
+}
+
+.rc-annot-icon-btn {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  color: var(--muted, #8b8b99);
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  height: 28px;
+  justify-content: center;
+  line-height: 1;
+  width: 28px;
+}
+
+.rc-annot-icon-btn:hover {
+  border-color: var(--border-light, rgba(255, 255, 255, 0.16));
+  color: var(--text-bright, #ffffff);
+}
+
+.rc-annot-popover {
+  background: var(--bg-card, #0d0d12);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 320px;
+  padding: 18px;
+  position: fixed;
+  width: 320px;
+  z-index: 120;
+}
+
+.rc-annot-popover__bar {
+  background-image: var(--grad-chrome);
+  border-radius: 999px;
+  height: 3px;
+  left: 18px;
+  position: absolute;
+  right: 18px;
+  top: 9px;
+}
+
+.rc-annot-popover__id {
+  color: var(--muted, #8b8b99);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  word-break: break-all;
+}
+
+.rc-annot-toggle {
+  align-items: center;
+  background: var(--bg-elevated, #14141c);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  color: var(--text, #e6e6ec);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  gap: 0.5em;
+  justify-content: center;
+  padding: 0.6em 1.15em;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.rc-annot-toggle:hover {
+  border-color: var(--border-light, rgba(255, 255, 255, 0.16));
+}
+
+.rc-annot-toggle--on {
+  background: rgba(242, 56, 90, 0.14);
+  border-color: var(--rc-red, #f2385a);
+  color: var(--rc-pink, #ff4da6);
+}
+
+.rc-annot-label {
+  color: var(--muted, #8b8b99);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rc-annot-textarea {
+  background: var(--bg-elevated, #14141c);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  color: var(--text-bright, #ffffff);
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  min-height: 76px;
+  padding: 0.7em 0.9em;
+  resize: vertical;
+  width: 100%;
+}
+
+.rc-annot-textarea:focus {
+  border-color: var(--border-light, rgba(255, 255, 255, 0.16));
+  outline: none;
+}
+
+.rc-annot-status {
+  color: var(--muted, #8b8b99);
+  font-size: 0.82rem;
+}
+
+.rc-annot-status--drawer {
+  margin: 0;
+  padding: 0 20px;
+}
+
+.rc-annot-save {
+  background-image: var(--grad-btn);
+  background-size: 200% 100%;
+  border: none;
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.55em 1.2em;
+}
+
+.rc-annot-pill {
+  align-items: center;
+  background: var(--bg-card, #0d0d12);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  color: var(--text-bright, #ffffff);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.7em 1.3em;
+  position: fixed;
+  right: 20px;
+  z-index: 100;
+}
+
+.rc-annot-pill:hover {
+  border-color: var(--border-light, rgba(255, 255, 255, 0.16));
+  background: var(--bg-elevated, #14141c);
+}
+
+.rc-annot-drawer {
+  background: var(--bg-card, #0d0d12);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-right: none;
+  border-radius: 16px 0 0 16px;
+  bottom: 0;
+  box-shadow: -18px 0 50px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding: 18px 0 24px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: min(400px, 100vw);
+  z-index: 110;
+}
+
+.rc-annot-drawer__head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.rc-annot-drawer__title {
+  color: var(--text-bright, #ffffff);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.rc-annot-drawer__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rc-annot-empty {
+  color: var(--muted, #8b8b99);
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0 20px;
+}
+
+.rc-annot-drawer__row {
+  background: var(--bg-elevated, #14141c);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 20px;
+  padding: 14px;
+}
+
+.rc-annot-drawer__row-head {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.rc-annot-drawer__id {
+  background: none;
+  border: none;
+  color: var(--muted, #8b8b99);
+  cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  padding: 0;
+  text-align: left;
+  text-transform: uppercase;
+  word-break: break-all;
+}
+
+.rc-annot-drawer__id:hover {
+  color: var(--rc-cyan, #3ee8e0);
+}
+
+.rc-annot-badge {
+  background: rgba(242, 56, 90, 0.14);
+  border: 1px solid var(--rc-red, #f2385a);
+  border-radius: 999px;
+  color: var(--rc-pink, #ff4da6);
+  flex-shrink: 0;
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 3px 9px;
+  text-transform: uppercase;
+}
+
+.rc-annot-textarea--row {
+  min-height: 60px;
+}
+
+.rc-annot-drawer__row-foot {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rc-annot-chip {
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  color: var(--text, #e6e6ec);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4em 0.95em;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.rc-annot-chip:hover:not(:disabled) {
+  border-color: var(--border-light, rgba(255, 255, 255, 0.16));
+}
+
+.rc-annot-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.rc-annot-chip--on {
+  background: rgba(242, 56, 90, 0.14);
+  border-color: var(--rc-red, #f2385a);
+  color: var(--rc-pink, #ff4da6);
+}
+
+.rc-annot-stamp {
+  color: var(--muted, #8b8b99);
+  font-size: 0.72rem;
+  margin-left: auto;
+}

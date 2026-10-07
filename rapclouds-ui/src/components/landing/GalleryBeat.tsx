@@ -25,6 +25,7 @@ export default function GalleryBeat({ beat }: { beat: Beat }): JSX.Element {
   return (
     <div
       data-beat={beat.id}
+      data-annot-target={`gallery:${beat.image}`}
       data-reveal="fall"
       className="grid grid-cols-1 items-center gap-10 py-14 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-16 md:py-24"
       style={{ overflowX: 'clip', transitionDelay: `${beat.delay}ms` }}
