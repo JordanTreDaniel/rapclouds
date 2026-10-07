@@ -661,6 +661,22 @@
   background: var(--bg-elevated, #14141c);
 }
 
+.rc-annot-toast {
+  background: var(--bg-card, #0d0d12);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  bottom: 72px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  color: var(--text-bright, #ffffff);
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+  font-size: 0.82rem;
+  max-width: min(320px, calc(100vw - 40px));
+  padding: 0.6em 1em;
+  position: fixed;
+  right: 20px;
+  z-index: 100;
+}
+
 .rc-annot-drawer {
   background: var(--bg-card, #0d0d12);
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));

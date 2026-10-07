@@ -380,6 +380,11 @@ function AnnotationLayerCore({
           </div>
         </div>
       )}
+      {statusText !== '' && !panelOpen && sel === null && (
+        <div className="rc-annot-toast" role="status">
+          {statusText}
+        </div>
+      )}
       <button
         type="button"
         onClick={() => setPanel(!panelOpen)}
