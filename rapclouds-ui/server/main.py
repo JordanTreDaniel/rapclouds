@@ -29,8 +29,9 @@ if _standalone_path not in sys.path:
 
 from fastapi import FastAPI, Query, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, FileResponse, HTMLResponse
+from fastapi.responses import StreamingResponse, FileResponse, HTMLResponse, JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from secrets import compare_digest
 from PIL import Image
 import numpy as np
 from wordcloud import WordCloud
@@ -121,6 +122,14 @@ try:
 except OSError:
     pass
 _signups_lock = asyncio.Lock()
+
+ANNOTATIONS_DIR = os.environ.get('RAPCLOUDS_ANNOTATIONS_DIR', '/opt/rapclouds/data/annotations')
+try:
+    os.makedirs(ANNOTATIONS_DIR, exist_ok=True)
+except OSError:
+    pass
+_annotations_lock = asyncio.Lock()
+CURATOR_TOKEN = os.environ.get('RAPCLOUDS_CURATOR_TOKEN', '')
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -227,6 +236,36 @@ class SignupRequest(BaseModel):
         if v not in ('shirt-art', 'karaoke'):
             raise ValueError('intent must be shirt-art or karaoke')
         return v
+
+
+class AnnotationRequest(BaseModel):
+    target: str
+    action: str
+    note: Optional[str] = None
+
+    @field_validator('target')
+    @classmethod
+    def validate_target(cls, v: str) -> str:
+        if not re.fullmatch(r'[a-z0-9][a-z0-9:_-]{0,95}', v):
+            raise ValueError('target must match [a-z0-9][a-z0-9:_-]{0,95}')
+        return v
+
+    @field_validator('action')
+    @classmethod
+    def validate_action(cls, v: str) -> str:
+        if v not in ('hide', 'show', 'note'):
+            raise ValueError('action must be hide, show, or note')
+        return v
+
+    @field_validator('note')
+    @classmethod
+    def validate_note(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        cleaned = ''.join(c for c in v if c == '\n' or (ord(c) >= 32 and ord(c) != 127))
+        if len(cleaned) > 2000:
+            raise ValueError('note must be 2000 characters or fewer')
+        return cleaned
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -1103,6 +1142,151 @@ async def signup(req: SignupRequest, request: Request):
             print(f'Signup write failed: {e}')
             raise HTTPException(status_code=500, detail=f'Signup write failed: {str(e)}')
     return {'ok': True, 'duplicate': False}
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  Annotations
+# ═══════════════════════════════════════════════════════════════════════
+
+def _require_curator(request: Request) -> None:
+    if not CURATOR_TOKEN:
+        raise HTTPException(status_code=403, detail='curator token not configured')
+    supplied = request.headers.get('X-Curator-Token', '')
+    try:
+        match = bool(supplied) and compare_digest(supplied, CURATOR_TOKEN)
+    except TypeError:
+        match = False
+    if not match:
+        raise HTTPException(status_code=401, detail='invalid curator token')
+
+
+def _load_annotations_state() -> Dict[str, Any]:
+    state_path = os.path.join(ANNOTATIONS_DIR, 'annotations-state.json')
+    if not os.path.isfile(state_path):
+        return {'updatedAt': None, 'targets': {}}
+    try:
+        with open(state_path, 'r', encoding='utf-8') as f:
+            state = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {'updatedAt': None, 'targets': {}}
+    if not isinstance(state, dict):
+        return {'updatedAt': None, 'targets': {}}
+    state.setdefault('updatedAt', None)
+    state.setdefault('targets', {})
+    return state
+
+
+def _load_annotation_events() -> List[Dict[str, Any]]:
+    jsonl_path = os.path.join(ANNOTATIONS_DIR, 'annotations.jsonl')
+    if not os.path.isfile(jsonl_path):
+        return []
+    try:
+        with open(jsonl_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+    except OSError:
+        return []
+    events: List[Dict[str, Any]] = []
+    for line in lines[-100:][::-1]:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(entry, dict):
+            events.append(entry)
+    return events
+
+
+@app.post('/api/annotations')
+async def create_annotation(req: AnnotationRequest, request: Request):
+    _require_curator(request)
+    now = datetime.now(timezone.utc)
+    ts = now.strftime('%Y%m%dT%H%M%SZ')
+    now_iso = now.isoformat()
+    sanitized = re.sub(r'[^a-z0-9_-]+', '-', req.target.lower())
+    filename = f'{ts}_{req.action}_{sanitized}.json'
+    record = {
+        'target': req.target,
+        'action': req.action,
+        'note': req.note,
+        'received_at': now_iso,
+        'source': 'rapclouds_landing',
+        'user_agent': request.headers.get('user-agent'),
+    }
+    async with _annotations_lock:
+        try:
+            def write_annotation():
+                state = _load_annotations_state()
+                targets = state.setdefault('targets', {})
+                t = targets.setdefault(req.target, {})
+                if req.action == 'hide':
+                    t['hidden'] = True
+                    t['hiddenAt'] = now_iso
+                elif req.action == 'show':
+                    t['hidden'] = False
+                    t['hiddenAt'] = now_iso
+                else:
+                    t['note'] = None if not req.note else req.note
+                    t['noteUpdatedAt'] = now_iso
+                if req.action in ('hide', 'show') and req.note is not None:
+                    t['note'] = None if not req.note else req.note
+                    t['noteUpdatedAt'] = now_iso
+                state['updatedAt'] = now_iso
+                os.makedirs(ANNOTATIONS_DIR, exist_ok=True)
+                state_path = os.path.join(ANNOTATIONS_DIR, 'annotations-state.json')
+                tmp_path = state_path + '.tmp'
+                with open(tmp_path, 'w', encoding='utf-8') as f:
+                    json.dump(state, f, ensure_ascii=False, indent=2)
+                os.replace(tmp_path, state_path)
+                jsonl_path = os.path.join(ANNOTATIONS_DIR, 'annotations.jsonl')
+                with open(jsonl_path, 'a', encoding='utf-8') as f:
+                    f.write(json.dumps({**record, 'file': filename}, ensure_ascii=False) + '\n')
+                    f.flush()
+                with open(os.path.join(ANNOTATIONS_DIR, filename), 'w', encoding='utf-8') as f:
+                    json.dump(record, f, ensure_ascii=False, indent=2)
+
+            await asyncio.to_thread(write_annotation)
+        except HTTPException:
+            raise
+        except Exception as e:
+            print(f'Annotation write failed: {e}')
+            raise HTTPException(status_code=500, detail=f'Annotation write failed: {str(e)}')
+    return {'ok': True}
+
+
+@app.get('/api/annotations')
+async def get_annotations(request: Request):
+    _require_curator(request)
+
+    def read_annotations():
+        state = _load_annotations_state()
+        events = _load_annotation_events()
+        return state, events
+
+    state, events = await asyncio.to_thread(read_annotations)
+    return {
+        'updatedAt': state.get('updatedAt'),
+        'targets': state.get('targets', {}),
+        'events': events,
+    }
+
+
+@app.get('/api/landing-config.json')
+async def landing_config():
+    def read_state():
+        return _load_annotations_state()
+
+    state = await asyncio.to_thread(read_state)
+    hidden = [
+        tid for tid, val in state.get('targets', {}).items()
+        if isinstance(val, dict) and val.get('hidden') is True
+    ]
+    return JSONResponse(
+        {'hidden': hidden, 'updatedAt': state.get('updatedAt')},
+        headers={'Cache-Control': 'no-cache, max-age=0'},
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════
